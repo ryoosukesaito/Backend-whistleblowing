@@ -1,45 +1,44 @@
 const mongoose = require("mongoose");
-const { Schema, model, SchemaType} = mongoose;
+const { Schema, model} = mongoose;
 
 const AdminSchema = new Schema({
    
     reportId: {
-        type: SchemaType.objectId,
+        type: Schema.Types.ObjectId,
         ref: 'Report' ,
-        required: true,
+        
     },
-    userDepartment: {
-        type: String,        
-    },
-    adminId: {
-        type: SchemaType.objectId,
-        ref: 'Admin' 
-    },
-    subject: {
-        type: String, 
-        required: true       
-    },
+      
     category_id :{
-        type: SchemaType.objectId,
+        type: Schema.Types.ObjectId,
         ref: 'Category' ,
-        required: true 
-    },
-    description: {
-        type: String, 
-        required: true       
-    },
-    file:{
-        type: String
-    },
-    status:{
-        type: String,
-        required: true   
+       
     },
     histories:{
-        type: SchemaType.objectId,
-        required: true,
+        type: Schema.Types.ObjectId,
         ref: 'History'   
     },    
+    name: {
+        type: String,
+        required: true,
+    },
+    
+    email: {
+        type: String,
+        // minlength: 10,
+        required: true,
+        lowercase: true,
+        unique:true
+    },
+    password: {
+        type: String,
+        // minlength: 10,
+        required: true
+    },
+    role: {
+        type: String,
+        required: true,
+    },
     createdAt: {
         type: Date,
         default: () => Date.now(),
