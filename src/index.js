@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const path = require("path");
 require("dotenv").config();
@@ -69,7 +70,5 @@ app.use((error, req,res,next) => {
 
 
 app.listen(process.env.PORT || 8080, () => {
-  console.log("Server has started...");
+  console.log(`Server listening on port ${process.env.PORT}`);
 });
-
-

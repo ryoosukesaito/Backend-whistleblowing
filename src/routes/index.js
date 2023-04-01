@@ -15,6 +15,7 @@ router.get("/api/admin/users/all", indexController.getAllUsers);
 router.get("/api/admin/users/:id", indexController.getUserById);
 
 
+
 //users login with email and password
 router.get("/api/login/findbyemail", indexController.getOneByEmail);
 router.get("/api/login/findbypassword", indexController.getOneByPassword);
@@ -49,3 +50,4 @@ router.post("/auth/resetPassword", resetPasswordController);
 
 
 module.exports = router;
+
