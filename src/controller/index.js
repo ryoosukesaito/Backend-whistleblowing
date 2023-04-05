@@ -1,16 +1,14 @@
-
 const User = require("../model/User");
 const Report = require("../model/Report");
 const Admin = require("../model/AdminAccount")
 const Category = require("../model/Category")
 
-
 //user
-exports.getAllUsers = async (req,res) => {
-  const a = await User.find({})
-  console.log(a)
-  res.send(a)
- }
+exports.getAllUsers = async (req, res) => {
+  const a = await User.find({});
+  console.log(a);
+  res.send(a);
+};
 
 exports.createUser = async (req, res) => {
   const {name , email, password} = req.body
@@ -21,34 +19,31 @@ exports.createUser = async (req, res) => {
     console.log("new User has been added successfully")
 
     res.status(200).json(saveUser)
-
   } catch (error) {
     console.error(error);
   }
 };
 
-exports.getUserById = async (req,res) => {
-  const id = req.body._id
-  const userFounddById = await User.findById(id)
-  console.log(userFounddById)
-  res.send(userFounddById)
- }
+exports.getUserById = async (req, res) => {
+  const id = req.params._id;
+  const userFounddById = await User.findById(id);
+  console.log(userFounddById);
+  res.send(userFounddById);
+};
 
+// login
 
- // login
+exports.getOneByEmail = async (req, res) => {
+  const a = await User.findOne({ email: req.body.email });
+  console.log(a);
+  res.send(a);
+};
 
-exports.getOneByEmail = async (req,res) => {
-  const a = await User.findOne({ email : req.body.email})
-  console.log(a)
-  res.send(a)
- }
-
- exports.getOneByPassword = async (req,res) => {
-  const a = await User.findOne({ password : req.body.password})
-  console.log(a)
-  res.send(a)
- }
-
+exports.getOneByPassword = async (req, res) => {
+  const a = await User.findOne({ password: req.body.password });
+  console.log(a);
+  res.send(a);
+};
 
 //  report
 
@@ -61,12 +56,16 @@ exports.getOneByEmail = async (req,res) => {
     console.log("new Report has been added successfully")
 
     res.status(200).json(saveReport)
-
   } catch (error) {
     console.error(error);
   }
 };
 
+exports.getAllReports = async (req, res) => {
+  const a = await Report.find({});
+  console.log(a);
+  res.send(a);
+};
 
 exports.getAllReports = async (req,res) => {
   const a = await Report.find({})
@@ -174,3 +173,4 @@ exports.getAllCategorys = async (req,res) => {
 
   res.send (CategoryDeleted)
  }
+
