@@ -2,9 +2,11 @@ const router = require("express").Router();
 const indexController = require('../controller')
 const {
     signUpController,
-    signInController,
+    signInControllerUser,
     resetPasswordRequestController,
-    resetPasswordController
+    resetPasswordController,
+    signInControllerAdmin,
+    signUpControllerAdmin
   } = require("../controller/auth.controller");
 
 router.get("/", async (req,res) => { res.json("health check")  })
@@ -25,7 +27,7 @@ router.get("/api/admin/reports", indexController.getAllReports);
 router.get("/api/admin/reports/:id", indexController.getReportById);
 
 //admins
-router.post("/api/admin/create/admin", indexController.createAdmin);
+// router.post("/api/admin/create/admin", indexController.createAdmin);
 router.get("/api/admin/all", indexController.getAllAdmins);
 router.get("/api/admin/:id", indexController.getAdminById);
 router.post("/api/admin/update/:id", indexController.updateAdmin);
@@ -42,8 +44,11 @@ router.delete("/api/admin/category/delete/:id", indexController.deleteCategory);
 // router.post("/api/users/create/user", indexController.createUser);
 
 //auth.controller
-router.post("/auth/signin", signInController);
-router.post("/auth/signup", signUpController);
+//because we will post new token on it
+router.post("/api/user/login", signInControllerUser);
+router.post("/api/admin/login", signInControllerAdmin);
+router.post("/api/user/signup", signUpController);
+router.post("/api/admin/signup", signUpControllerAdmin);
 router.post("/auth/requestResetPassword", resetPasswordRequestController);
 router.post("/auth/resetPassword", resetPasswordController);
 
