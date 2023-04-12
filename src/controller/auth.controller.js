@@ -1,20 +1,34 @@
 const {
     signUp,
-    signIn,
+    signInUser,
     requestResetPassword,
-    resetPassword
+    resetPassword,
+    signInAdmin,
+    signUpAdmin
   } = require("../services/auth.service");
   
   const signUpController = async (req, res, next) => {
     const signUpService = await signUp(req.body);
     return res.json(signUpService);
   };
+
+  const signUpControllerAdmin = async (req, res, next) => {
+    const signUpService = await signUpAdmin(req.body);
+    return res.json(signUpService);
+  };
   
-  const signInController = async (req, res, next) => {
+  const signInControllerUser = async (req, res, next) => {
       const { email, password } = req.body
-      const signInService = await signIn(email, password)
+      const signInService = await signInUser(email, password)
       return res.json(signInService)
   }
+
+  const signInControllerAdmin = async (req, res, next) => {
+    const { email, password } = req.body
+    console.log( email+"----"+ password )
+    const signInService = await signInAdmin(email, password)
+    return res.json(signInService)
+}
   
   const resetPasswordRequestController = async (req, res, next) => {
       const re = await requestResetPassword(req.body.email)
@@ -31,8 +45,10 @@ const {
   
   module.exports = {
     signUpController,
-    signInController,
+    signInControllerUser,
     resetPasswordRequestController,
-    resetPasswordController
+    resetPasswordController,
+    signInControllerAdmin,
+    signUpControllerAdmin
   };
   

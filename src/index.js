@@ -7,6 +7,7 @@ const multer = require('multer');
 const GridFsStorage = require('multer-gridfs-storage').GridFsStorage
 const crypto = require('crypto');
 require('express-async-errors')
+const cors = require('cors')
 
 
 // require('./services/mongoose.service')
@@ -18,7 +19,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(methodOverride('_method'));
 app.use(express.json())
-
+app.use(cors())
 app.use("/", require("./routes/index"));
 
 

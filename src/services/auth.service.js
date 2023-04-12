@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs')
 const sendEmail = require("../utils/email/sendEmail")
 const User = require("../model/User")
 const Token = require("../model/Token")
+const Admin = require("../model/AdminAccount")
 
 const {jwtSecret, salt, clientUrl} = require("../config")
 
@@ -27,7 +28,30 @@ const signUp = async (data) => {
         token
     })
 }
-const signIn = async (email, password) => {
+
+const signUpAdmin = async (data) => {
+    const { email } = data
+    let admin = await Admin.findOne({ email })
+
+    if(admin) throw new Error("Email already exists")
+
+    admin = new Admin(data)
+
+    //generate a JWT token，token for sign up
+    const token = JWT.sign({ id: admin._id }, jwtSecret)
+    await admin.save()
+
+    return( data = {
+        adminId: admin._id,
+        email: admin.email,
+        name: admin.name,
+        role: admin.role,
+        token
+    })
+}
+
+
+const signInUser = async (email, password) => {
     let user = await User.findOne({ email })
 
     if(!user) throw new Error("User does not exists. Please try again")
@@ -41,6 +65,28 @@ const signIn = async (email, password) => {
             userId: user._id,
             email: user.email,
             name: user.name,
+            token
+        })
+    }else{
+        throw new Error("Incorrect credentials")
+    }
+}
+
+const signInAdmin = async (email, password) => {
+    let admin = await Admin.findOne({ email })
+    console.log(admin)
+    if(!admin) throw new Error("Admin does not exists. Please try again")
+//bcrypt.compare() for checking
+    const isValid = await bcrypt.compare(password, admin.password)
+//create token for sign in
+    const token = JWT.sign({ id: admin._id}, jwtSecret)
+
+    if(isValid){
+        return (data = {
+            adminId: admin._id,
+            email: admin.email,
+            name: admin.name,
+            role: admin.role,
             token
         })
     }else{
@@ -110,7 +156,9 @@ const resetPassword = async (userId, token, newPassword) => {
 
 module.exports = {
     signUp,
-    signIn,
+    signInUser,
     requestResetPassword,
-    resetPassword
+    resetPassword,
+    signInAdmin,
+    signUpAdmin
 }
