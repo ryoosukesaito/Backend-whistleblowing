@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 const Report = require("./Report")
+const bcrypt = require('bcryptjs')
+const {salt} = require("../config")
 
 const userSchema = new Schema({
     name: {
@@ -37,6 +39,14 @@ userSchema.pre('save', function(next){
     // console.log(this);
     const user = this
     user.updatedAt = Date.now()
+    next()
+})
+
+userSchema.pre("save", async function(next){
+    if(!this.isModified("password")) return next()
+    const hash = await bcrypt.hash(this.password, salt)
+    //密碼的加密是bcrypt管的，不是JWT
+    this.password = hash
     next()
 })
 

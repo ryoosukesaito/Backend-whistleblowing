@@ -1,45 +1,46 @@
 const mongoose = require("mongoose");
-const { Schema, model, SchemaType} = mongoose;
+const { Schema, model} = mongoose;
+const bcrypt = require('bcryptjs')
+const {salt} = require("../config")
 
 const AdminSchema = new Schema({
    
     reportId: {
-        type: SchemaType.objectId,
+        type: Schema.Types.ObjectId,
         ref: 'Report' ,
-        required: true,
+        
     },
-    userDepartment: {
-        type: String,        
-    },
-    adminId: {
-        type: SchemaType.objectId,
-        ref: 'Admin' 
-    },
-    subject: {
-        type: String, 
-        required: true       
-    },
+      
     category_id :{
-        type: SchemaType.objectId,
+        type: Schema.Types.ObjectId,
         ref: 'Category' ,
-        required: true 
-    },
-    description: {
-        type: String, 
-        required: true       
-    },
-    file:{
-        type: String
-    },
-    status:{
-        type: String,
-        required: true   
+       
     },
     histories:{
-        type: SchemaType.objectId,
-        required: true,
+        type: Schema.Types.ObjectId,
         ref: 'History'   
     },    
+    name: {
+        type: String,
+        required: true,
+    },
+    
+    email: {
+        type: String,
+        // minlength: 10,
+        required: true,
+        lowercase: true,
+        unique:true
+    },
+    password: {
+        type: String,
+        // minlength: 10,
+        required: true
+    },
+    role: {
+        type: String,
+        required: true,
+    },
     createdAt: {
         type: Date,
         default: () => Date.now(),
@@ -54,6 +55,14 @@ AdminSchema.pre('save', function(next){
     // console.log(this);
     const Admin = this
     Admin.updatedAt = Date.now()
+    next()
+})
+
+AdminSchema.pre("save", async function(next){
+    if(!this.isModified("password")) return next()
+    const hash = await bcrypt.hash(this.password, salt)
+    //密碼的加密是bcrypt管的，不是JWT
+    this.password = hash
     next()
 })
 
