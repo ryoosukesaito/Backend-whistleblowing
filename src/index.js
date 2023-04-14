@@ -11,6 +11,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.json());
 
+app.use("/api/user", require("./routes/user"));
 app.use("/", require("./routes/index"));
 
 app.listen(process.env.PORT || 8080, () => {
