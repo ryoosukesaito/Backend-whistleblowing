@@ -1,3 +1,11 @@
+const {
+    getReport,
+    sessionCheck,
+    createReport,
+    getReportById,
+    getHistoriesByReportId,
+    putNewHistory
+  } = require("../../middlewares/user/reports.services");
 
 
 //ログインユーザーに紐づくレポートデータを返す

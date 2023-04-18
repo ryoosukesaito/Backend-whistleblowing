@@ -24,33 +24,39 @@ const {
 
 //auth
 // user login api
-router.post("/api/user/login", userPostLoginController);
+router.post("/login", userPostLoginController);
 // user sign up api
-router.post("/api/user/register",userPostRegisterController);
+router.post("/register",userPostRegisterController);
 // user password change from header api
-router.patch("/api/user/password",userPatchPasswordController);
+router.patch("/password",userPatchPasswordController);
 // user send forgot passsword email api
-router.post("/api/user/password/email", userPostPasswordEmailController);
+router.post("/password/email", userPostPasswordEmailController);
 // user reset password from email api
-router.patch("/api/user/password/reset", userPatchPasswordResetController);
-
-
-//notice
-// user count notice api
-router.get("/api/user/notice", userGetNoticeController);
-// user delete notice api
-router.delete("/api/user/notice", userDeleteNoticeController);
-
+router.patch("/password/reset", userPatchPasswordResetController);
 
 //reports
 // passing of report data tied to logged-in users
-router.get("/api/user/reports", userGetReportsController);
+router.get("/reports", userGetReportsController);
 // user post new report
-router.post("/api/user/reports", userPostReportsController);
+router.post("/reports", userPostReportsController);
 // user get report detail
-router.get("/api/user/reports/:id", userGetReportByIdController);
+router.get("/reports/:id", userGetReportByIdController);
 // user create new history
-router.put("/api/user/reports", userPutReortHistoryController);
+router.put("/reports", userPutReortHistoryController);
+
+//notice
+// user count notice api
+router.get("/notice", userGetNoticeController);
+// user delete notice api
+router.delete("/notice", userDeleteNoticeController);
+
+
+router.get("/test",(req, res) => {
+    console.log("USER TEST!")
+    res.send('USER TEST!')
+  })
+
+
 
 
 

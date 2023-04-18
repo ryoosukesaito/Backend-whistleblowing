@@ -1,3 +1,9 @@
+const {
+    getNotice,
+    deleteNotice,
+  } = require("../../middlewares/user/notice.services");
+
+
 //ログインユーザーに紐づくunreadSchemaのヒストリーデータを返す
 const userGetNoticeController = async (req, res, next) => {
     const{ email, session } = req.body

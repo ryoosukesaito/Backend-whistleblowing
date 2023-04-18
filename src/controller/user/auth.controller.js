@@ -1,10 +1,20 @@
 
+const {
+  signIn,
+  signUp,
+  changePassword,
+  requestResetPassword,
+  resetPassword
+} = require("../../middlewares/user/auth.services");
+
+
 const userPostLoginController = async (req, res, next) => {
   const { email, password } = req.body
   console.log(password)
   const signInService = await signIn(email, password)
   return res.json(signInService)
 }
+
 
 const userPostRegisterController = async (req, res, next) => {
     const signUpService = await signUp(req.body);
