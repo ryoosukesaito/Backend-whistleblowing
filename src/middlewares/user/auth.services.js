@@ -99,7 +99,7 @@ const requestResetPassword = async (email) => {
         createdAt: Date.now()
     }).save()
 
-    const link = `${clientUrl}/users/passwordReset?token=${resetToken}&id=${user._id}`
+    const link = `${clientUrl}/users/passwordreset?token=${resetToken}&id=${user._id}`
     // 8080/api/user/password/reset?token=""""""&id=&&&&&
     // 
 
@@ -107,7 +107,7 @@ const requestResetPassword = async (email) => {
     sendEmail(
         user.email,
         "Password Reset Request",
-        { name: user.name, link },
+        { name: user.name, link:link },
         "./template/requestResetPassword.handlebars"
     )
 
@@ -147,10 +147,6 @@ const changePassword = async(currentPassword, newPassword,token)=>{
 
 const resetPassword = async (userId, token, newPassword) => {
     const databaseSideUserToken = await Token.findOne({ userId})
-    console.log(userId);
-    console.log(token);
-    console.log(newPassword);
-    console.log(databaseSideUserToken);
     
     if(!databaseSideUserToken) throw new Error("Invalid entry or the password reset has expired")
     

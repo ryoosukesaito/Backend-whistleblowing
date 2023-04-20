@@ -1,6 +1,8 @@
 const router = require("express").Router();
 // この下後で消す
 const Unread = require("../model/Unread")
+const Report = require("../model/Report")
+const Admin = require("../model/AdminAccount")
 
 const {
     userPostLoginController,
@@ -67,5 +69,6 @@ router.post("/notice",(req,res)=>{
     unread.save()
     res.send('done')
 })
+
 
 module.exports = router;

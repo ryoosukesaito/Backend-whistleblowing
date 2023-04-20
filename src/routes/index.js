@@ -1,8 +1,9 @@
 const router = require("express").Router();
 const indexController = require('../controller')
 const {
-    signUpController,
-    signInControllerUser,
+    // signUpController,
+    // signInControllerUser,
+    inviteComtrollerAdmin,
     resetPasswordRequestController,
     resetPasswordController,
     signInControllerAdmin,
@@ -46,10 +47,13 @@ router.delete("/api/admin/category/delete/:id", indexController.deleteCategory);
 
 //auth.controller
 //because we will post new token on it
-router.post("/api/user/login", signInControllerUser);
+// router.post("/api/user/login", signInControllerUser);
 router.post("/api/admin/login", signInControllerAdmin);
-router.post("/api/user/signup", signUpController);
+// router.post("/api/user/signup", signUpController);
+
+router.post("/api/admin/invite",inviteComtrollerAdmin)
 router.post("/api/admin/signup", signUpControllerAdmin);
+
 router.post("/auth/requestResetPassword", resetPasswordRequestController);
 router.post("/auth/resetPassword", resetPasswordController);
 

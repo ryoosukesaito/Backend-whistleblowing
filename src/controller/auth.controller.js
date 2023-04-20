@@ -1,5 +1,6 @@
 const {
-    signUp,
+    // signUp,
+    inviteAdmin,
     signInUser,
     requestResetPassword,
     resetPassword,
@@ -12,8 +13,17 @@ const {
     return res.json(signUpService);
   };
 
+  const inviteComtrollerAdmin = async(req,res,next)=>{
+    const {email,role} = req.body
+    const inviteService = await inviteAdmin(email,role)
+    return res.json(inviteService)
+  }
+
   const signUpControllerAdmin = async (req, res, next) => {
-    const signUpService = await signUpAdmin(req.body);
+    // const signUpService = await signUpAdmin(req.body);
+    const {token,email,name,password} = req.body
+
+    const signUpService = await signUpAdmin(token,email,name,password)
     return res.json(signUpService);
   };
   
@@ -46,6 +56,7 @@ const {
   module.exports = {
     signUpController,
     signInControllerUser,
+    inviteComtrollerAdmin,
     resetPasswordRequestController,
     resetPasswordController,
     signInControllerAdmin,
