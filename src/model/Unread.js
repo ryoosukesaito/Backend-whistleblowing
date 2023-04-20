@@ -4,17 +4,18 @@ const { Schema, model} = mongoose;
 const unreadSchema = new Schema({
    reportId: {
         type:Schema.Types.ObjectId,
-        ref:"Report"
+        ref:"Report",
+        required: true
     
     },
     userId: {
         type: Schema.Types.ObjectId,
-        ref: 'User' ,
+        ref: 'User'
         
     },
     adminId: {
         type: Schema.Types.ObjectId,
-        ref: 'Admin' 
+        ref: 'Admin'
     },
     
 })
