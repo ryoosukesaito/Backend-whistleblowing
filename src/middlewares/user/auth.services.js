@@ -45,8 +45,7 @@ const signIn = async (email, password) => {
 
 
 
-const signUp = async (data) => {
-    const { email } = data
+const signUp = async (name, email,password) => {
     let user = await User.findOne({ email })
 
     const SIGNUP_ERR_MSG = "Email already exists"
@@ -57,7 +56,11 @@ const signUp = async (data) => {
     }
 
     // userSchemaに沿った新しいuserを生成
-    user = new User(data)
+    user = new User({
+        name:name, 
+        email:email,
+        password:password
+    })
 
     // generate a JWT token
     // 新規登録後、ログイン画面に戻る(改めてログインが必要)
@@ -81,18 +84,24 @@ const requestResetPassword = async (email) => {
     if(!user) throw new Error("User does not exists")
 
     const token = await Token.findOne({ userId: user._id })
+    // 以前に再発行メールを送信していれば以前登録されたトークンは削除する
     if(token) await token.deleteOne()
 
+    // 32bitトークンの発行
     const resetToken = crypto.randomBytes(32).toString("hex")
+    // 発行したトークンのハッシュ化（暗号化）
     const hash = await bcrypt.hash(resetToken, salt)
 
+    // DBに発行したトークンを登録（ユーザID、ハッシュ化したトークン、生成日時）
     await new Token({
         userId: user._id,
         token: hash,
         createdAt: Date.now()
     }).save()
 
-    const link = `${clientUrl}/api/auth/passwordReset?token=${resetToken}&id=${user._id}`
+    const link = `${clientUrl}/users/passwordReset?token=${resetToken}&id=${user._id}`
+    // 8080/api/user/password/reset?token=""""""&id=&&&&&
+    // 
 
     //send an email
     sendEmail(
@@ -105,12 +114,48 @@ const requestResetPassword = async (email) => {
     return link
 }
 
+const changePassword = async(currentPassword, newPassword,token)=>{
+    
+    let tokenUserId
+    await checkToken(token).then((targetUserId)=>{
+        tokenUserId= targetUserId
+    }).catch((error)=>{
+        throw error
+    })
+
+    try {
+        
+        const targetUser = await User.findById(tokenUserId)
+
+        const isValidPassword = await bcrypt.compare(currentPassword, targetUser.password)
+        
+        
+        
+        
+            if(isValidPassword){
+                targetUser.password = newPassword
+                await targetUser.save()    
+            }else{
+                const error = new Error('invalid current password, please try again')
+                error.status = 404
+                throw error
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
 const resetPassword = async (userId, token, newPassword) => {
-    const passwordResetToken = await Token.findOne({ userId})
-
-    if(!passwordResetToken) throw new Error("Invalid entry or the password reset has expired")
-
-    const isValid = await bcrypt.compare(token, passwordResetToken.token)
+    const databaseSideUserToken = await Token.findOne({ userId})
+    console.log(userId);
+    console.log(token);
+    console.log(newPassword);
+    console.log(databaseSideUserToken);
+    
+    if(!databaseSideUserToken) throw new Error("Invalid entry or the password reset has expired")
+    
+    const isValid = await bcrypt.compare(token, databaseSideUserToken.token)
+    console.log(isValid);
 
     if(!isValid) throw new Error("Invalid entry or the password reset has expired")
 
@@ -127,14 +172,35 @@ const resetPassword = async (userId, token, newPassword) => {
         "./template/resetPassword.handlebars"
     )
 
-    await passwordResetToken.deleteOne()
+    await databaseSideUserToken.deleteOne()
 
     return true
+}
+
+const checkToken = async(token)=>{
+
+    if (!token) {
+        const error = new Error('invalid token, please login first')
+        error.status = 404
+        throw error
+    } else {
+        try {
+          let user = await JWT.verify(token, jwtSecret);
+          return user.id
+        } catch {
+            const error = new Error('invalid token, please login first')
+            error.status = 404
+            throw error
+
+        }
+      }
 }
 
 module.exports = {
     signUp,
     signIn,
+    changePassword,
     requestResetPassword,
-    resetPassword
+    resetPassword,
+    checkToken
 }

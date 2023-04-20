@@ -2,44 +2,46 @@ const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
 const reportSchema = new Schema({
-    userName: {
+    userName:{
         type: String,
             },
-    userId: {
+    userId:{
         type: Schema.Types.ObjectId,
         ref: 'User' ,
         // required: true,
     },
     
-    userDepartment: {
+    userDepartment:{
         type: String,        
     },
     adminId: {
         type: Schema.Types.ObjectId,
         ref: 'Admin' 
     },
-    subject: {
+    subject:{
         type: String, 
         required: true       
     },
-    category_id :{
+    category_id:{
         type: Schema.Types.ObjectId,
         ref: 'Category' ,
         // required: true 
     },
-    description: {
+    description:{
         type: String, 
         required: true       
     },
     file:{
-        type: String
+        type: Schema.Types.ObjectId,
+        ref:'Image'
     },
     status:{
         type: String,
-        required: true   
+        required: true,
+        default:"Not started"
     },
     histories:{
-        type: Schema.Types.ObjectId,
+        type: [Schema.Types.ObjectId],
         // required: true,
         ref: 'History'   
     },    

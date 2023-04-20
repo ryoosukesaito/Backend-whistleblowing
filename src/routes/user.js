@@ -1,4 +1,6 @@
 const router = require("express").Router();
+// この下後で消す
+const Unread = require("../model/Unread")
 
 const {
     userPostLoginController,
@@ -42,7 +44,7 @@ router.post("/reports", userPostReportsController);
 // user get report detail
 router.get("/reports/:id", userGetReportByIdController);
 // user create new history
-router.put("/reports", userPutReortHistoryController);
+router.put("/reports/:id", userPutReortHistoryController);
 
 //notice
 // user count notice api
@@ -56,8 +58,14 @@ router.get("/test",(req, res) => {
     res.send('USER TEST!')
   })
 
-
-
-
+router.post("/notice",(req,res)=>{
+    const {reportId,userId}=req.body
+    const unread = new Unread({
+        reportId:reportId,
+        userId:userId
+    })
+    unread.save()
+    res.send('done')
+})
 
 module.exports = router;

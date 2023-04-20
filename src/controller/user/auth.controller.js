@@ -17,15 +17,25 @@ const userPostLoginController = async (req, res, next) => {
 
 
 const userPostRegisterController = async (req, res, next) => {
-    const signUpService = await signUp(req.body);
+    const {name, email,password} = req.body
+    const signUpService = await signUp(name, email,password);
     return res.json(signUpService);
   };
 
 
 
 const userPatchPasswordController = async (req, res, next) => {
-    const {userId, currentPassword, newPassword} = req.body
-    const changePasswordService = await changePassword(userId, currentPassword, newPassword)
+    const {currentPassword, newPassword} = req.body
+    const token = req.header('x-auth-token');
+
+    let changePasswordService 
+    try {
+      changePasswordService = await changePassword(currentPassword, newPassword,token)
+      
+    } catch (error) {
+      
+      throw error
+    }
     return res.json(changePasswordService)
 }
 
@@ -42,8 +52,6 @@ const userPatchPasswordResetController = async (req, res, next) => {
     const resetPasswordService = await resetPassword(userId, token, password)
     return res.json(resetPasswordService)
 }
-
-
 
 module.exports = {
     userPostLoginController,
