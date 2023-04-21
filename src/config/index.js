@@ -1,7 +1,7 @@
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 
 // Set the NODE_ENV to 'development' by default
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+process.env.NODE_ENV = process.env.NODE_ENV || "development";
 
 const envFound = dotenv.config();
 if (envFound.error) {
@@ -12,9 +12,10 @@ module.exports = {
   port: process.env.PORT,
   databaseURL: process.env.MONGODB_URI,
   jwtSecret: process.env.JWT_SECRET,
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN,
   salt: Number(process.env.SALT),
   api: {
-    prefix: '/api',
+    prefix: "/api",
   },
   clientUrl: process.env.CLIENT_URL,
   email: {
