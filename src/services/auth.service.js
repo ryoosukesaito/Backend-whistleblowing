@@ -108,12 +108,12 @@ const signUpAdmin = async(token,email,name,password)=>{
 
         // 招待メール送信時に作成したAdminTokenを削除
         admintoken.delete()
-return (data = {
-    adminId: newAdmin._id,
-    email: newAdmin.email,
-    name: newAdmin.name,
-    role: newAdmin.role,
-  });
+        return (data = {
+            adminId: newAdmin._id,
+            email: newAdmin.email,
+            name: newAdmin.name,
+            role: newAdmin.role,
+        });
     }else{
         // トークンが見つからない
         throw new Error("something bad")
