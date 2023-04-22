@@ -118,7 +118,7 @@ exports.getAllAdmins = async (req, res) => {
 };
 
 exports.getAdminById = async (req, res) => {
-  const id = req.body._id;
+  const id = req.params.id;
   const adminFounddById = await Admin.findById(id);
   console.log(adminFounddById);
   res.send(adminFounddById);

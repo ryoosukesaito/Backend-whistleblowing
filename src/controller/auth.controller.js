@@ -50,8 +50,8 @@ const resetPasswordRequestController = async (req, res, next) => {
 };
 
 const resetPasswordController = async (req, res, next) => {
-  const { userId, token, password } = req.body;
-  const resetPasswordService = await resetPassword(userId, token, password);
+  const { adminId, token, password } = req.body;
+  const resetPasswordService = await resetPassword(adminId, token, password);
   return res.json(resetPasswordService);
 };
 
