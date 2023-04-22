@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const sendEmail = require("../utils/email/sendEmail");
 const User = require("../model/User");
 const Token = require("../model/Token");
+const TokenAdmin = require("../model/TokenAdmin");
 const Admin = require("../model/AdminAccount");
 
 const { jwtSecret, salt, clientUrl, jwtExpiresIn } = require("../config");
@@ -104,40 +105,38 @@ const logoutAdmin = async (adminId, token) => {
 };
 
 const requestResetPassword = async (email) => {
-  const user = await User.findOne({ email });
-  if (!user) throw new Error("User does not exists");
+  const admin = await Admin.findOne({ email });
+  if (!admin) throw new Error("User does not exists");
 
   //no matter what, delete the token either created when signup or signin
-  const token = await Token.findOne({ userId: user._id });
+  const token = await TokenAdmin.findOne({ adminId: admin._id });
   if (token) await token.deleteOne();
 
   const resetToken = crypto.randomBytes(32).toString("hex");
   const hash = await bcrypt.hash(resetToken, salt);
 
-  await new Token({
-    userId: user._id,
+  await new TokenAdmin({
+    adminId: admin._id,
     token: hash,
     createdAt: Date.now(),
   }).save();
 
-  const link = `${clientUrl}/api/auth/passwordReset?token=${resetToken}&id=${user._id}`;
+  const link = `${clientUrl}/api/auth/passwordReset?token=${resetToken}&id=${admin._id}`;
 
   //send an email
   sendEmail(
-    user.email,
+    admin.email,
     "Password Reset Request",
-    { name: user.name, link },
+    { name: admin.name, link },
     "./template/requestResetPassword.handlebars"
   );
 
   return link;
 };
 
-const resetPassword = async (userId, token, newPassword) => {
-  const passwordResetToken = await Token.findOne({ userId });
-
-  if (!passwordResetToken)
-    throw new Error("Invalid entry or the password reset has expired");
+const resetPassword = async (adminId, token, newPassword) => {
+  const passwordResetToken = await TokenAdmin.findOne({ adminId });
+  if (!passwordResetToken) throw new Error("The password reset has expired");
 
   //use bcrypt to check
   const isValid = await bcrypt.compare(token, passwordResetToken.token);
@@ -149,14 +148,14 @@ const resetPassword = async (userId, token, newPassword) => {
   const hash = await bcrypt.hash(newPassword, salt);
 
   //second argument is the column you want to replace
-  await User.updateOne({ _id: userId }, { $set: { password: hash } });
+  await Admin.updateOne({ _id: adminId }, { $set: { password: hash } });
 
-  const user = await User.findById({ _id: userId });
+  const admin = await Admin.findById({ _id: adminId });
 
   sendEmail(
-    user.email,
+    admin.email,
     "Password Reset Successfully",
-    { name: user.name },
+    { name: admin.name },
     "./template/resetPassword.handlebars"
   );
 
