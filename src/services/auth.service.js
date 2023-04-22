@@ -1,14 +1,13 @@
-const JWT = require("jsonwebtoken")
-const crypto = require("crypto")
-const bcrypt = require('bcryptjs')
+const JWT = require("jsonwebtoken");
+const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
 
 const sendEmail = require("../utils/email/sendEmail")
 const User = require("../model/User")
 const Token = require("../model/Token")
-const AdminToken = require("../model/AdminToken")
 const Admin = require("../model/AdminAccount")
 
-const {jwtSecret, salt, clientUrl} = require("../config")
+const { jwtSecret, salt, clientUrl, jwtExpiresIn } = require("../config");
 
 // const signUp = async (data) => {
 //     const { email } = data
@@ -109,7 +108,12 @@ const signUpAdmin = async(token,email,name,password)=>{
 
         // 招待メール送信時に作成したAdminTokenを削除
         admintoken.delete()
-        return data={msg:'success!'}
+return (data = {
+    adminId: newAdmin._id,
+    email: newAdmin.email,
+    name: newAdmin.name,
+    role: newAdmin.role,
+  });
     }else{
         // トークンが見つからない
         throw new Error("something bad")
@@ -159,86 +163,96 @@ const signUpAdmin = async(token,email,name,password)=>{
 // }
 
 const signInAdmin = async (email, password) => {
-    let admin = await Admin.findOne({ email })
-    console.log(admin)
-    if(!admin) throw new Error("Admin does not exists. Please try again")
-//bcrypt.compare() for checking
-    const isValid = await bcrypt.compare(password, admin.password)
-//create token for sign in
-    const token = JWT.sign({ id: admin._id}, jwtSecret)
+  let admin = await Admin.findOne({ email });
+  console.log(admin);
+  if (!admin) throw new Error("Admin does not exists. Please try again");
+  //bcrypt.compare() for checking
+  const isValid = await bcrypt.compare(password, admin.password);
+  //create token for sign in
+  const token = JWT.sign({ id: admin._id }, jwtSecret, {
+    expiresIn: jwtExpiresIn,
+  });
 
-    if(isValid){
-        return (data = {
-            adminId: admin._id,
-            email: admin.email,
-            name: admin.name,
-            role: admin.role,
-            token
-        })
-    }else{
-        throw new Error("Incorrect credentials")
-    }
-}
+  if (isValid) {
+    return (data = {
+      adminId: admin._id,
+      email: admin.email,
+      name: admin.name,
+      role: admin.role,
+      token,
+    });
+  } else {
+    throw new Error("Incorrect credentials");
+  }
+};
+
+const logoutAdmin = async (adminId, token) => {
+  const admin = await Admin.findOne({ _id: adminId });
+
+  if (admin) {
+    return admin;
+  }
+};
 
 const requestResetPassword = async (email) => {
-    const user = await User.findOne({email})
-    if(!user) throw new Error("User does not exists")
+  const admin = await Admin.findOne({ email });
+  if (!admin) throw new Error("User does not exists");
 
-    //no matter what, delete the token either created when signup or signin
-    const token = await Token.findOne({ userId: user._id })
-    if(token) await token.deleteOne()
+  //no matter what, delete the token either created when signup or signin
+  const token = await TokenAdmin.findOne({ adminId: admin._id });
+  if (token) await token.deleteOne();
 
-    const resetToken = crypto.randomBytes(32).toString("hex")
-    const hash = await bcrypt.hash(resetToken, salt)
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  const hash = await bcrypt.hash(resetToken, salt);
 
-    await new Token({
-        userId: user._id,
-        token: hash,
-        createdAt: Date.now()
-    }).save()
+  await new TokenAdmin({
+    adminId: admin._id,
+    token: hash,
+    createdAt: Date.now(),
+  }).save();
 
-    const link = `${clientUrl}/api/auth/passwordReset?token=${resetToken}&id=${user._id}`
+  const link = `${clientUrl}/api/auth/passwordReset?token=${resetToken}&id=${admin._id}`;
 
-    //send an email
-    sendEmail(
-        user.email,
-        "Password Reset Request",
-        { name: user.name, link },
-        "./template/requestResetPassword.handlebars"
-    )
+  //send an email
+  sendEmail(
+    admin.email,
+    "Password Reset Request",
+    { name: admin.name, link },
+    "./template/requestResetPassword.handlebars"
+  );
 
-    return link
-}
+  return link;
+};
 
-const resetPassword = async (userId, token, newPassword) => {
-    const passwordResetToken = await Token.findOne({ userId})
+const resetPassword = async (adminId, token, newPassword) => {
+  const passwordResetToken = await TokenAdmin.findOne({ adminId });
+  if (!passwordResetToken) throw new Error("The password reset has expired");
 
-    if(!passwordResetToken) throw new Error("Invalid entry or the password reset has expired")
+  //use bcrypt to check
+  const isValid = await bcrypt.compare(token, passwordResetToken.token);
 
-    //use bcrypt to check
-    const isValid = await bcrypt.compare(token, passwordResetToken.token)
+  if (!isValid)
+    throw new Error("Invalid entry or the password reset has expired");
 
-    if(!isValid) throw new Error("Invalid entry or the password reset has expired")
+  //encrypt the new password provided by user
+  const hash = await bcrypt.hash(newPassword, salt);
 
-    //encrypt the new password provided by user
-    const hash = await bcrypt.hash(newPassword, salt)
+  //second argument is the column you want to replace
+  await Admin.updateOne({ _id: adminId }, { $set: { password: hash } });
 
-    //second argument is the column you want to replace 
-    await User.updateOne({ _id: userId }, { $set: { password: hash }})
+  const admin = await Admin.findById({ _id: adminId });
 
-    const user = await User.findById({ _id: userId })
+  sendEmail(
+    admin.email,
+    "Password Reset Successfully",
+    { name: admin.name },
+    "./template/resetPassword.handlebars"
+  );
 
-    sendEmail(
-        user.email,
-        "Password Reset Successfully",
-        { name: user.name },
-        "./template/resetPassword.handlebars"
-    )
+  await passwordResetToken.deleteOne();
 
-    await passwordResetToken.deleteOne()
-
-    return true
-}
+  return true;
+};
 
 module.exports = {
     // signUp,
@@ -247,5 +261,6 @@ module.exports = {
     requestResetPassword,
     resetPassword,
     signInAdmin,
-    signUpAdmin
-}
+    signUpAdmin,
+    logoutAdmin,
+};
