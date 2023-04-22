@@ -1,8 +1,9 @@
-const User = require("../../model/User");
-const Report = require("../../model/Report");
-const History = require("../../model/History");
-const Unread = require("../../model/Unread");
-const Admin = require("../../model/AdminAccount");
+const User = require("../../model/User")
+const Report = require("../../model/Report")
+const History = require("../../model/History")
+const Unread = require("../../model/Unread")
+const Admin = require("../../model/AdminAccount")
+const sendEmail = require("../../utils/email/sendEmail")
 
 const { checkToken } = require("./auth.services");
 
@@ -38,6 +39,12 @@ const createReport = async (token, report) => {
       });
       console.log(unread);
       unread.save();
+      sendEmail(
+        admin.email,
+        "New report posted",
+        { name: admin.name },
+        "./template/newReportCrated.handlebars"
+    )
     });
   } else {
     throw new Error("something wrong");
@@ -82,6 +89,7 @@ const putNewHistory = async (token, history, reportId) => {
   try {
     if (targetUserId) {
       const newHistory = new History({
+        reportId:reportId,
         userId: targetUserId,
         replierType: "user",
         name: await getUserNameByReportId(reportId),
@@ -95,6 +103,14 @@ const putNewHistory = async (token, history, reportId) => {
           adminId: targetReport.adminId,
         });
         newUnread.save();
+        // 担当者がいる場合は通知メールを送る
+        const admin = await Admin.findById(targetReport.adminId)
+        sendEmail(
+            admin.email,
+            "New report posted",
+            {name:admin.name, reportId: reportId },
+            "./template/reportUpdated.handlebars"
+        )
       }
     } else {
       throw new Error("something bad");

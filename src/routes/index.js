@@ -1,14 +1,14 @@
 const router = require("express").Router();
 const indexController = require("../controller");
 const {
-  signUpController,
-  signInControllerUser,
-  resetPasswordRequestController,
-  resetPasswordController,
-  signInControllerAdmin,
-  signUpControllerAdmin,
-  logoutControllerAdmin,
-} = require("../controller/auth.controller");
+    // signUpController,
+    // signInControllerUser,
+    inviteComtrollerAdmin,
+    resetPasswordRequestController,
+    resetPasswordController,
+    signInControllerAdmin,
+    signUpControllerAdmin
+  } = require("../controller/auth.controller");
 
 const {
   getHistoryByReportId,
@@ -55,9 +55,11 @@ router.post("/api/history", postHistory);
 
 //auth.controller
 //because we will post new token on it
-router.post("/api/user/login", signInControllerUser);
+// router.post("/api/user/login", signInControllerUser);
 router.post("/api/admin/login", signInControllerAdmin);
-router.post("/api/user/signup", signUpController);
+// router.post("/api/user/signup", signUpController);
+
+router.post("/api/admin/invite",inviteComtrollerAdmin)
 router.post("/api/admin/signup", signUpControllerAdmin);
 router.delete("/api/admin/logout", logoutControllerAdmin);
 router.post("/auth/requestResetPassword", resetPasswordRequestController);

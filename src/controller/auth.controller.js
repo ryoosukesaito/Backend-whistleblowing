@@ -1,6 +1,7 @@
 const {
   signUp,
   signInUser,
+  inviteAdmin,
   requestResetPassword,
   resetPassword,
   signInAdmin,
@@ -8,21 +9,31 @@ const {
   logoutAdmin,
 } = require("../services/auth.service");
 
-const signUpController = async (req, res, next) => {
-  const signUpService = await signUp(req.body);
-  return res.json(signUpService);
-};
+  
+  const signUpController = async (req, res, next) => {
+    const signUpService = await signUp(req.body);
+    return res.json(signUpService);
+  };
 
-const signUpControllerAdmin = async (req, res, next) => {
-  const signUpService = await signUpAdmin(req.body);
-  return res.json(signUpService);
-};
+  const inviteComtrollerAdmin = async(req,res,next)=>{
+    const {email,role} = req.body
+    const inviteService = await inviteAdmin(email,role)
+    return res.json(inviteService)
+  }
 
-const signInControllerUser = async (req, res, next) => {
-  const { email, password } = req.body;
-  const signInService = await signInUser(email, password);
-  return res.json(signInService);
-};
+  const signUpControllerAdmin = async (req, res, next) => {
+    // const signUpService = await signUpAdmin(req.body);
+    const {token,email,name,password} = req.body
+
+    const signUpService = await signUpAdmin(token,email,name,password)
+    return res.json(signUpService);
+  };
+  
+  const signInControllerUser = async (req, res, next) => {
+      const { email, password } = req.body
+      const signInService = await signInUser(email, password)
+      return res.json(signInService)
+  }
 
 const signInControllerAdmin = async (req, res, next) => {
   const { email, password } = req.body;
@@ -58,6 +69,7 @@ const resetPasswordController = async (req, res, next) => {
 module.exports = {
   signUpController,
   signInControllerUser,
+  inviteComtrollerAdmin,
   resetPasswordRequestController,
   resetPasswordController,
   signInControllerAdmin,
