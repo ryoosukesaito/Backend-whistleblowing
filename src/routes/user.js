@@ -60,6 +60,8 @@ router.get("/test",(req, res) => {
     res.send('USER TEST!')
   })
 
+// Admin側でNotice生成の処理が実装されていない為、一時的にメソッドを作成しました。
+// フロントエンドでは使用しないでください。
 router.post("/notice",(req,res)=>{
     const {reportId,userId}=req.body
     const unread = new Unread({
@@ -68,6 +70,22 @@ router.post("/notice",(req,res)=>{
     })
     unread.save()
     res.send('done')
+})
+
+// テストデータが増えた為、開発中のデータ削除用エンドポイントを用意しておきます。
+// フロントエンドでは使用しないでください。
+router.delete("/reports/:id",(req,res)=>{
+    console.log("削除実行します")
+    const History = require("../model/History")
+    const Report = require("../model/Report")
+    const reportId = req.params.id
+
+    History.deleteMany({reportId:reportId}).then((data)=>console.log(data))
+    Report.findById(reportId).then((data)=>data.delete())
+
+    res.send({msg:"done"})
+
+
 })
 
 

@@ -1,5 +1,8 @@
 const Report = require("../../model/Report");
 const History = require("../../model/History");
+const {
+  cryptoSecret
+} = require("../../config");
 
 //function for get history by report id
 const getHistoryByReportId = async (req, res) => {
@@ -8,7 +11,12 @@ const getHistoryByReportId = async (req, res) => {
   try {
     const reportHistories = await Report.findById(reportId)
       .populate("histories")
-      .then((data) => res.status(200).send(data))
+      .then((data) => {
+        data.forEach(history => {
+          history.message = CryptoJS.AES.encrypt(history.message,cryptoSecret).toString(CryptoJS.enc.Utf8)
+        });
+        res.status(200).send(data)
+      })
       .catch((err) => console.log(err));
   } catch (error) {
     console.log(error.error);

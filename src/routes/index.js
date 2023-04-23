@@ -7,7 +7,8 @@ const {
     resetPasswordRequestController,
     resetPasswordController,
     signInControllerAdmin,
-    signUpControllerAdmin
+    signUpControllerAdmin,
+    logoutControllerAdmin
   } = require("../controller/auth.controller");
 
 const {

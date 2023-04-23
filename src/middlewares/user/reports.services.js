@@ -4,6 +4,10 @@ const History = require("../../model/History")
 const Unread = require("../../model/Unread")
 const Admin = require("../../model/AdminAccount")
 const sendEmail = require("../../utils/email/sendEmail")
+const CryptoJS = require("crypto-js")
+const {
+  cryptoSecret
+} = require("../../config");
 
 const { checkToken } = require("./auth.services");
 
@@ -15,6 +19,10 @@ const getReports = async (token) => {
       const reports = await Report.find({ userId: targetUserId }).sort({
         createdAt: -1,
       });
+      reports.forEach(report => {
+        report.subject = CryptoJS.AES.decrypt(report.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
+        report.description = CryptoJS.AES.decrypt(report.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
+      });     
       console.log(reports);
       return (data = reports);
     }
@@ -29,7 +37,13 @@ const createReport = async (token, report) => {
 
   if (targetUserId) {
     const newReport = await new Report(report);
-    newReport.save();
+    try {
+      newReport.save();
+      console.log("saved")
+      
+    } catch (error) {
+      console.log(error)
+    } 
 
     const superAdmins = await Admin.find({ role: "superAdmin" });
     superAdmins.forEach((admin) => {
@@ -37,7 +51,6 @@ const createReport = async (token, report) => {
         reportId: newReport._id,
         adminId: admin._id,
       });
-      console.log(unread);
       unread.save();
       sendEmail(
         admin.email,
@@ -58,8 +71,8 @@ const getReportById = async (token, id) => {
 
   if (targetUserId) {
     const report = await Report.findById(id);
-
-    console.log(report);
+    report.subject = CryptoJS.AES.decrypt(report.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
+    report.description = CryptoJS.AES.decrypt(report.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
 
     if (report.userId == targetUserId) {
       return report;
@@ -77,7 +90,11 @@ const getHistoriesByReportId = async (token, reportId) => {
   const targetUserId = await checkToken(token);
 
   if (targetUserId) {
-    const histories = History.find({ reportId: reportId });
+    const histories = await History.find({ reportId: reportId });
+    console.log(histories);
+    histories.forEach(history => {
+      history.message = CryptoJS.AES.encrypt(history.message,cryptoSecret).toString(CryptoJS.enc.Utf8)
+    });
     return histories;
   } else {
     throw new Error("something bad");
