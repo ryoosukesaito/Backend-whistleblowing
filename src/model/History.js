@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
 const historySchema = new Schema({
-   reportId: {
+    reportId: {
         type:Schema.Types.ObjectId,
-        ref:"Report"
-    
+        ref:"Report",
+        required: true
     },
     userId: {
         type: Schema.Types.ObjectId,
@@ -17,6 +17,10 @@ const historySchema = new Schema({
         ref: 'Admin' 
     },
     
+    name: {
+        type: String,  
+        required: true       
+    },
     message: {
         type: String,  
         required: true       
