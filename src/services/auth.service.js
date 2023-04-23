@@ -6,6 +6,7 @@ const sendEmail = require("../utils/email/sendEmail")
 const User = require("../model/User")
 const Token = require("../model/Token")
 const Admin = require("../model/AdminAccount")
+const TokenAdmin = require("../model/TokenAdmin")
 
 const { jwtSecret, salt, clientUrl, jwtExpiresIn } = require("../config");
 
@@ -169,9 +170,7 @@ const signInAdmin = async (email, password) => {
   //bcrypt.compare() for checking
   const isValid = await bcrypt.compare(password, admin.password);
   //create token for sign in
-  const token = JWT.sign({ id: admin._id }, jwtSecret, {
-    expiresIn: jwtExpiresIn,
-  });
+  const token = JWT.sign({ id: admin._id }, jwtSecret);
 
   if (isValid) {
     return (data = {

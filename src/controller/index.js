@@ -2,11 +2,12 @@ const User = require("../model/User");
 const Report = require("../model/Report");
 const Admin = require("../model/AdminAccount");
 const Category = require("../model/Category");
+const Unread = require("../model/Unread");
+const JWT = require("jsonwebtoken")
 const CryptoJS = require("crypto-js")
 const {
-  cryptoSecret
+  cryptoSecret,jwtSecret,
 } = require("../config");
-
 //user
 exports.getAllUsers = async (req, res) => {
   const a = await User.find({});
@@ -194,3 +195,44 @@ exports.deleteCategory = async (req, res) => {
 
   res.send(CategoryDeleted);
 };
+exports.getAdminNoticesController= async(req,res)=>{
+  const token = req.header('x-auth-token');
+  console.log(token);
+  if(token){
+    const admin = await JWT.verify(token, jwtSecret);
+    const notices = await Unread.find({adminId:admin.id})
+    const resData = []
+    if(notices){
+      for(const notice of notices){
+        const subject = await getSubjectByReportId(notice.reportId)
+        resData.push({id:notice.id,reportId:notice.reportId,subject:subject})
+      }
+    }
+    return res.send(data=resData)
+
+  }else{
+    throw new Error("something bad")
+  }
+}
+exports.deleteAdminNoticesController=async (req,res)=>{
+  try {
+    await Unread.findByIdAndDelete(req.params.id)
+    console.log("delete");
+    res.send( data={msg:"success"})
+  } catch (error) {
+    throw error
+  }
+}
+const getSubjectByReportId= async (reportId)=>{
+  const report = await Report.findById(reportId)
+  if(report){
+    const subject = CryptoJS.AES.decrypt(report.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
+    return subject
+  }else{
+    return "Not Found Report"
+  }
+}
+
+// module.exports={
+//   getAdminNoticesController
+// }
