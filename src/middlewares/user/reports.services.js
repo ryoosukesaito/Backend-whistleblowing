@@ -45,8 +45,8 @@ const createReport = async (token, report) => {
       console.log(error)
     } 
 
-    const superAdmins = await Admin.find({ role: "superAdmin" });
-    superAdmins.forEach((admin) => {
+    const admins = await Admin.find({});
+    admins.forEach((admin) => {
     const unread = new Unread({
       reportId: newReport._id,
       adminId: admin._id,

@@ -8,8 +8,12 @@ const {
     resetPasswordController,
     signInControllerAdmin,
     signUpControllerAdmin,
-    logoutControllerAdmin
+    logoutControllerAdmin,
   } = require("../controller/auth.controller");
+
+// const {
+//   getAdminNoticesController
+// }= require("../controller")
 
 const {
   getHistoryByReportId,
@@ -32,7 +36,10 @@ router.get("/api/login/findbypassword", indexController.getOneByPassword);
 router.post("/api/admin/create/report", indexController.createReport);
 router.get("/api/admin/reports", indexController.getAllReports);
 router.get("/api/admin/reports/:id", indexController.getReportById);
-
+// notice
+router.get("/api/admin/notices", indexController.getAdminNoticesController);
+// notice
+router.delete("/api/admin/notices/:id", indexController.deleteAdminNoticesController);
 //admins
 // router.post("/api/admin/create/admin", indexController.createAdmin);
 router.get("/api/admin/all", indexController.getAllAdmins);
