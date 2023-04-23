@@ -1,5 +1,8 @@
 const Report = require("../../model/Report");
 const History = require("../../model/History");
+const User = require("../../model/User");
+const Unread = require("../../model/Unread");
+const sendEmail = require("../../utils/email/sendEmail")
 const {
   cryptoSecret
 } = require("../../config");
@@ -13,7 +16,7 @@ const getHistoryByReportId = async (req, res) => {
       .populate("histories")
       .then((data) => {
         data.forEach(history => {
-          history.message = CryptoJS.AES.encrypt(history.message,cryptoSecret).toString(CryptoJS.enc.Utf8)
+          history.message = CryptoJS.AES.decrypt(history.message,cryptoSecret).toString(CryptoJS.enc.Utf8)
         });
         res.status(200).send(data)
       })
@@ -36,16 +39,17 @@ const postHistory = async (req, res) => {
       message: history.message,
       replierType: history.replierType,
     });
-    const saveNewHistory = await postNewHistory
-      .save()
-      .then(() => {
-        console.log("History saved successfully");
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    // 保存処理が二重になっていた為、暗号化が複数回実行されてしまい複合出来なくなるためコメントアウト
+    // const saveNewHistory = await postNewHistory
+    //   .save()
+    //   .then(() => {
+    //     console.log("History saved successfully");
+    //   })
+    //   .catch((err) => {
+    //     console.error(err);
+    //   });
 
-    Report.findByIdAndUpdate(history.reportId, {
+    await Report.findByIdAndUpdate(history.reportId, {
       $push: { histories: postNewHistory._id },
     })
       .then(() => {
@@ -54,7 +58,21 @@ const postHistory = async (req, res) => {
       .catch((err) => {
         console.error(err);
       });
+      // notice 実装
+      const user = await User.findById(history.userId)
+      console.log(user.email);
+      sendEmail(
+        user.email,
+        "Your report is updated",
+        {name:user.name, reportId: history.reportId },
+        "./template/reportUpdatedByAdmin.handlebars"
+      )
 
+      const unread = new Unread({
+        reportId: history.reportId,
+        userId: user._id,
+      });
+      unread.save();
     res.status(200).send(postNewHistory);
   } catch (error) {
     let msg;

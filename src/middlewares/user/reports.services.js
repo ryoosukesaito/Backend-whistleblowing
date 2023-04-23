@@ -47,16 +47,16 @@ const createReport = async (token, report) => {
 
     const superAdmins = await Admin.find({ role: "superAdmin" });
     superAdmins.forEach((admin) => {
-      const unread = new Unread({
-        reportId: newReport._id,
-        adminId: admin._id,
-      });
-      unread.save();
-      sendEmail(
-        admin.email,
-        "New report posted",
-        { name: admin.name },
-        "./template/newReportCrated.handlebars"
+    const unread = new Unread({
+      reportId: newReport._id,
+      adminId: admin._id,
+    });
+    unread.save();
+    sendEmail(
+      admin.email,
+      "New report posted",
+      { name: admin.name },
+      "./template/newReportCrated.handlebars"
     )
     });
   } else {
@@ -91,9 +91,8 @@ const getHistoriesByReportId = async (token, reportId) => {
 
   if (targetUserId) {
     const histories = await History.find({ reportId: reportId });
-    console.log(histories);
     histories.forEach(history => {
-      history.message = CryptoJS.AES.encrypt(history.message,cryptoSecret).toString(CryptoJS.enc.Utf8)
+      history.message = CryptoJS.AES.decrypt(history.message,cryptoSecret).toString(CryptoJS.enc.Utf8)
     });
     return histories;
   } else {
@@ -112,13 +111,17 @@ const putNewHistory = async (token, history, reportId) => {
         name: await getUserNameByReportId(reportId),
         message: history.message,
       });
-      newHistory.save();
+      await newHistory.save()
+      await Report.findByIdAndUpdate(reportId, {
+        $push: { histories: newHistory._id},
+      }).then((data)=>console.log(data))
       const targetReport = await Report.findById(reportId);
       if (targetReport.adminId) {
         const newUnread = new Unread({
           reportId: reportId,
           adminId: targetReport.adminId,
         });
+
         newUnread.save();
         // 担当者がいる場合は通知メールを送る
         const admin = await Admin.findById(targetReport.adminId)
@@ -126,7 +129,7 @@ const putNewHistory = async (token, history, reportId) => {
             admin.email,
             "New report posted",
             {name:admin.name, reportId: reportId },
-            "./template/reportUpdated.handlebars"
+            "./template/reportUpdatedByUser.handlebars"
         )
       }
     } else {

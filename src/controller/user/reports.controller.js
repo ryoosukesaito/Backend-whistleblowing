@@ -31,7 +31,6 @@ const userGetReportByIdController = async (req, res, next) => {
         
         const token = req.header('x-auth-token');
         const report = await getReportById(token,req.params.id)
-        console.log(report)
         const histories = await getHistoriesByReportId(token,req.params.id)
         return res.json(
             {
