@@ -26,4 +26,5 @@ module.exports = {
     from: process.env.EMAIL_FROM,
   },
   rootDir: process.cwd(),
+  cryptoSecret: process.env.CRYPTO_SECRET
 };

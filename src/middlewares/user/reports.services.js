@@ -4,6 +4,10 @@ const History = require("../../model/History")
 const Unread = require("../../model/Unread")
 const Admin = require("../../model/AdminAccount")
 const sendEmail = require("../../utils/email/sendEmail")
+const CryptoJS = require("crypto-js")
+const {
+  cryptoSecret
+} = require("../../config");
 
 const { checkToken } = require("./auth.services");
 
@@ -15,6 +19,10 @@ const getReports = async (token) => {
       const reports = await Report.find({ userId: targetUserId }).sort({
         createdAt: -1,
       });
+      reports.forEach(report => {
+        report.subject = CryptoJS.AES.decrypt(report.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
+        report.description = CryptoJS.AES.decrypt(report.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
+      });     
       console.log(reports);
       return (data = reports);
     }
@@ -29,21 +37,26 @@ const createReport = async (token, report) => {
 
   if (targetUserId) {
     const newReport = await new Report(report);
-    newReport.save();
+    try {
+      newReport.save();
+      console.log("saved")
+      
+    } catch (error) {
+      console.log(error)
+    } 
 
     const superAdmins = await Admin.find({ role: "superAdmin" });
     superAdmins.forEach((admin) => {
-      const unread = new Unread({
-        reportId: newReport._id,
-        adminId: admin._id,
-      });
-      console.log(unread);
-      unread.save();
-      sendEmail(
-        admin.email,
-        "New report posted",
-        { name: admin.name },
-        "./template/newReportCrated.handlebars"
+    const unread = new Unread({
+      reportId: newReport._id,
+      adminId: admin._id,
+    });
+    unread.save();
+    sendEmail(
+      admin.email,
+      "New report posted",
+      { name: admin.name },
+      "./template/newReportCrated.handlebars"
     )
     });
   } else {
@@ -58,8 +71,8 @@ const getReportById = async (token, id) => {
 
   if (targetUserId) {
     const report = await Report.findById(id);
-
-    console.log(report);
+    report.subject = CryptoJS.AES.decrypt(report.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
+    report.description = CryptoJS.AES.decrypt(report.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
 
     if (report.userId == targetUserId) {
       return report;
@@ -77,7 +90,10 @@ const getHistoriesByReportId = async (token, reportId) => {
   const targetUserId = await checkToken(token);
 
   if (targetUserId) {
-    const histories = History.find({ reportId: reportId });
+    const histories = await History.find({ reportId: reportId });
+    histories.forEach(history => {
+      history.message = CryptoJS.AES.decrypt(history.message,cryptoSecret).toString(CryptoJS.enc.Utf8)
+    });
     return histories;
   } else {
     throw new Error("something bad");
@@ -95,13 +111,17 @@ const putNewHistory = async (token, history, reportId) => {
         name: await getUserNameByReportId(reportId),
         message: history.message,
       });
-      newHistory.save();
+      await newHistory.save()
+      await Report.findByIdAndUpdate(reportId, {
+        $push: { histories: newHistory._id},
+      }).then((data)=>console.log(data))
       const targetReport = await Report.findById(reportId);
       if (targetReport.adminId) {
         const newUnread = new Unread({
           reportId: reportId,
           adminId: targetReport.adminId,
         });
+
         newUnread.save();
         // 担当者がいる場合は通知メールを送る
         const admin = await Admin.findById(targetReport.adminId)
@@ -109,7 +129,7 @@ const putNewHistory = async (token, history, reportId) => {
             admin.email,
             "New report posted",
             {name:admin.name, reportId: reportId },
-            "./template/reportUpdated.handlebars"
+            "./template/reportUpdatedByUser.handlebars"
         )
       }
     } else {

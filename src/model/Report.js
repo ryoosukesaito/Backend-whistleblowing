@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
+const CryptoJS = require("crypto-js")
+const {
+    cryptoSecret
+  } = require("../config");
 
 const reportSchema = new Schema({
     userName:{
@@ -57,6 +61,8 @@ const reportSchema = new Schema({
 reportSchema.pre('save', function(next){
     // console.log(this);
     const reports = this
+    reports.subject = CryptoJS.AES.encrypt(reports.subject,cryptoSecret).toString()
+    reports.description = CryptoJS.AES.encrypt(reports.description,cryptoSecret).toString()
     reports.updatedAt = Date.now()
     next()
 })

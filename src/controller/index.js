@@ -2,6 +2,10 @@ const User = require("../model/User");
 const Report = require("../model/Report");
 const Admin = require("../model/AdminAccount");
 const Category = require("../model/Category");
+const CryptoJS = require("crypto-js")
+const {
+  cryptoSecret
+} = require("../config");
 
 //user
 exports.getAllUsers = async (req, res) => {
@@ -85,6 +89,10 @@ exports.createReport = async (req, res) => {
 
 exports.getAllReports = async (req, res) => {
   const a = await Report.find({});
+  a.forEach(report => {
+    report.subject = CryptoJS.AES.decrypt(report.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
+    report.description = CryptoJS.AES.decrypt(report.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
+  });
   // console.log(a);
   res.send(a);
 };
@@ -93,6 +101,9 @@ exports.getReportById = async (req, res) => {
   const id = req.params.id;
   const reportFounddById = await Report.findById(id).populate("userId");
   // console.log(reportFounddById);
+  reportFounddById.subject = await CryptoJS.AES.decrypt(reportFounddById.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
+  reportFounddById.description = await CryptoJS.AES.decrypt(reportFounddById.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
+  console.log(reportFounddById);
   res.send(reportFounddById);
 };
 
