@@ -6,7 +6,7 @@ npm install --legacy-peers-deps
 npm run dev  
 
 ## Updates
-- 2023-04-22 differenciate GET report with one decrypted and non-decrypted (supposely we should use with decrypted one after we clean our database to delete those data with description being encrytpted )  
+- 2023-04-22 differenciate GET report with one decrypted and non-decrypted (supposely we should use with decrypted one after we clean our database to delete those data without description being encrytpted )  
 
 ## backend API documentation
 
