@@ -32,6 +32,7 @@ router.post("/api/admin/create/report", indexController.createReport);
 router.get("/api/admin/reports", indexController.getAllReports);
 router.get("/api/admin/reports/:id", indexController.getReportById);
 router.get("/api/admin/adminID/reports", indexController.getReportByAdminId);
+router.get("/api/admin/decrypted/reports", indexController.getAllReportDecrypted);
 
 //admins
 router.post("/api/admin/create/admin", indexController.createAdmin);

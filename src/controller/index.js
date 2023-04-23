@@ -125,6 +125,26 @@ exports.getReportByAdminId = async (req, res) => {
   res.send(reportFounddById);
 };
 
+exports.getAllReportDecrypted = async (req, res) => {
+  
+
+  // const reportFounddById = await Report.find({adminId:  req.body.adminId}).select("descrption")
+  const allReport = await Report.find({});
+  
+  if(!allReport) { throw new Error("Nothing found under this admin ID")}
+
+  
+  allReport.map( report => {
+      const decrypt = CryptoJS.AES.decrypt(report.description, 'secret key 123')
+      var originalText = decrypt.toString(CryptoJS.enc.Utf8);
+      report.description = originalText;
+  })
+
+  // const descr = allReport[0].description
+  console.log(allReport)
+
+  res.send(allReport);
+};
 
 
 //admin
