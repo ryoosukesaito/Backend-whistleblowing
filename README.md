@@ -1,5 +1,10 @@
 # whistleblowing-backend
 
+git clone
+npm install --legacy-peers-deps
+npm run dev
+
+
 https://docs.google.com/spreadsheets/d/1VKras1BjnyMhqFx3t7bIxtpX9c_y50C9fZqlR6UQn3I/edit?usp=sharing
 
 ![image](https://user-images.githubusercontent.com/102844561/233815274-77857cee-6846-4f4b-b6b0-9d442b827fc8.png)
