@@ -6,7 +6,8 @@ const sendEmail = require("../utils/email/sendEmail")
 const User = require("../model/User")
 const Token = require("../model/Token")
 const Admin = require("../model/AdminAccount")
-const TokenAdmin = require("../model/TokenAdmin")
+const AdminToken = require("../model/AdminToken")
+const PasswordResetToken = require("../model/PasswordResetToken")
 
 const { jwtSecret, salt, clientUrl, jwtExpiresIn } = require("../config");
 
@@ -198,13 +199,13 @@ const requestResetPassword = async (email) => {
   if (!admin) throw new Error("User does not exists");
 
   //no matter what, delete the token either created when signup or signin
-  const token = await TokenAdmin.findOne({ adminId: admin._id });
+  const token = await PasswordResetToken.findOne({ adminId: admin._id });
   if (token) await token.deleteOne();
 
   const resetToken = crypto.randomBytes(32).toString("hex");
   const hash = await bcrypt.hash(resetToken, salt);
 
-  await new TokenAdmin({
+  await new PasswordResetToken({
     adminId: admin._id,
     token: hash,
     createdAt: Date.now(),
@@ -224,7 +225,7 @@ const requestResetPassword = async (email) => {
 };
 
 const resetPassword = async (adminId, token, newPassword) => {
-  const passwordResetToken = await TokenAdmin.findOne({ adminId });
+  const passwordResetToken = await PasswordResetToken.findOne({ adminId });
   if (!passwordResetToken) throw new Error("The password reset has expired");
 
   //use bcrypt to check
