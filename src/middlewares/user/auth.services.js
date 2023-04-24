@@ -43,6 +43,15 @@ const signIn = async (email, password) => {
     }
 }
 
+const signOut = async(email)=>{
+    let user = await User.findOne({email:email})
+    if(user){
+        return data=user
+    }else{
+        throw new Error("something bad")
+    }
+}
+
 
 
 const signUp = async (name, email,password) => {
@@ -198,5 +207,6 @@ module.exports = {
     changePassword,
     requestResetPassword,
     resetPassword,
-    checkToken
+    checkToken,
+    signOut
 }

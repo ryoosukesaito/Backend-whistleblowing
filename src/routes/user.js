@@ -9,7 +9,8 @@ const {
     userPostRegisterController,
     userPatchPasswordController,
     userPostPasswordEmailController,
-    userPatchPasswordResetController
+    userPatchPasswordResetController,
+    userPostLogoutController
 } = require("../controller/user/auth.controller");
 
 const {
@@ -29,6 +30,8 @@ const {
 //auth
 // user login api
 router.post("/login", userPostLoginController);
+// user logout api
+router.delete("/logout", userPostLogoutController);
 // user sign up api
 router.post("/register",userPostRegisterController);
 // user password change from header api

@@ -4,7 +4,8 @@ const {
   signUp,
   changePassword,
   requestResetPassword,
-  resetPassword
+  resetPassword,
+  signOut
 } = require("../../middlewares/user/auth.services");
 
 
@@ -13,6 +14,11 @@ const userPostLoginController = async (req, res, next) => {
   console.log(password)
   const signInService = await signIn(email, password)
   return res.json(signInService)
+}
+const userPostLogoutController = async (req, res, next) => {
+  const { email} = req.body
+  const signOutService = await signOut(email)
+  return res.json(signOutService)
 }
 
 
@@ -58,5 +64,6 @@ module.exports = {
     userPostRegisterController,
     userPatchPasswordController,
     userPostPasswordEmailController,
-    userPatchPasswordResetController
+    userPatchPasswordResetController,
+    userPostLogoutController
   };
