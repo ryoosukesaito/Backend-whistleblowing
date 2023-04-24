@@ -104,19 +104,21 @@ exports.getReportById = async (req, res) => {
   // console.log(reportFounddById);
   reportFounddById.subject = await CryptoJS.AES.decrypt(reportFounddById.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
   reportFounddById.description = await CryptoJS.AES.decrypt(reportFounddById.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
-  console.log(reportFounddById);
+  // console.log(reportFounddById);
   res.send(reportFounddById);
 };
 
 exports.updateReportStateById =async(req,res)=>{
   const id = req.params.id;
   const {status}=req.body
+  console.log(status);
   try {
-    
     await Report.findByIdAndUpdate(id,{
-      $status:status
+      status:status
     })
+    res.send({msg:"success"}) 
   } catch (error) {
+    console.log(error);
     throw error
   }
 }
