@@ -190,8 +190,10 @@ const checkToken = async(token)=>{
         throw error
     } else {
         try {
-          let user = await JWT.verify(token, jwtSecret);
+          let user = JWT.verify(token, jwtSecret);
+          console.log(user);
           return user.id
+          
         } catch {
             const error = new Error('invalid token, please login first')
             error.status = 404
