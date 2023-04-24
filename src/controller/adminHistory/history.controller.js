@@ -3,6 +3,7 @@ const History = require("../../model/History");
 const User = require("../../model/User");
 const Unread = require("../../model/Unread");
 const sendEmail = require("../../utils/email/sendEmail")
+const CryptoJS = require("crypto-js")
 const {
   cryptoSecret
 } = require("../../config");
@@ -15,9 +16,12 @@ const getHistoryByReportId = async (req, res) => {
     const reportHistories = await Report.findById(reportId)
       .populate("histories")
       .then((data) => {
-        data.forEach(history => {
-          history.message = CryptoJS.AES.decrypt(history.message,cryptoSecret).toString(CryptoJS.enc.Utf8)
-        });
+        console.log(data);
+        if(data.histories){
+          data.histories.forEach(history => {
+            history.message = CryptoJS.AES.decrypt(history.message,cryptoSecret).toString(CryptoJS.enc.Utf8)
+          });
+        }
         res.status(200).send(data)
       })
       .catch((err) => console.log(err));
