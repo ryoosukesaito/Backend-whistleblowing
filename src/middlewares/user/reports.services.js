@@ -67,13 +67,15 @@ const createReport = async (token, report) => {
 
 const getReportById = async (token, id) => {
   // セッション情報チェック
+  console.log("id:"+id);
   const targetUserId = await checkToken(token);
+console.log("targetUserId:"+targetUserId);
 
   if (targetUserId) {
     const report = await Report.findById(id);
     report.subject = CryptoJS.AES.decrypt(report.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
     report.description = CryptoJS.AES.decrypt(report.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
-
+    console.log(report);
     if (report.userId == targetUserId) {
       return report;
     } else {
@@ -88,6 +90,7 @@ const getHistoriesByReportId = async (token, reportId) => {
   // mongoDBからhistory複数件を取得
   // セッション情報チェック
   const targetUserId = await checkToken(token);
+  console.log(targetUserId);
 
   if (targetUserId) {
     const histories = await History.find({ reportId: reportId });
