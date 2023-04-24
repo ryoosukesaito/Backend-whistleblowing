@@ -108,6 +108,19 @@ exports.getReportById = async (req, res) => {
   res.send(reportFounddById);
 };
 
+exports.updateReportStateById =async(req,res)=>{
+  const id = req.params.id;
+  const {status}=req.body
+  try {
+    
+    await Report.findByIdAndUpdate(id,{
+      $status:status
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
 //admin
 
 exports.createAdmin = async (req, res) => {
