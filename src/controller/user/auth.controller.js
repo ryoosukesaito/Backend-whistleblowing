@@ -37,6 +37,7 @@ const userPatchPasswordController = async (req, res, next) => {
     let changePasswordService 
     try {
       changePasswordService = await changePassword(currentPassword, newPassword,token)
+      return res.status(200).json(changePasswordService)
       
     } catch (error) {
       

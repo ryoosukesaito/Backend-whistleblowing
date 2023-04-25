@@ -124,7 +124,6 @@ const requestResetPassword = async (email) => {
 }
 
 const changePassword = async(currentPassword, newPassword,token)=>{
-    
     let tokenUserId
     await checkToken(token).then((targetUserId)=>{
         tokenUserId= targetUserId
@@ -143,7 +142,8 @@ const changePassword = async(currentPassword, newPassword,token)=>{
         
             if(isValidPassword){
                 targetUser.password = newPassword
-                await targetUser.save()    
+                await targetUser.save()  
+                return data={msg:"success"}
             }else{
                 const error = new Error('invalid current password, please try again')
                 error.status = 404
