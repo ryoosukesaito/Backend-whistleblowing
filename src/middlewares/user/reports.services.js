@@ -130,7 +130,7 @@ const putNewHistory = async (token, history, reportId) => {
         const admin = await Admin.findById(targetReport.adminId)
         sendEmail(
             admin.email,
-            "New report posted",
+            "Updated the report you asigned",
             {name:admin.name, reportId: reportId },
             "./template/reportUpdatedByUser.handlebars"
         )

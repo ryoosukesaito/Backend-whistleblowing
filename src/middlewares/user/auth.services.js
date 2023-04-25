@@ -33,7 +33,7 @@ const signIn = async (email, password) => {
     // 照合が成功した場合DB上のuserId、email,userNameと生成したtokenを返す
     if(isValid){
         return (data = {
-            userId: user._id,
+            _id: user._id,
             email: user.email,
             name: user.name,
             token
