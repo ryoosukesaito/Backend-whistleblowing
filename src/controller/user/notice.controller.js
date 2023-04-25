@@ -16,7 +16,7 @@ const userGetNoticeController = async (req, res, next) => {
 //ログインユーザーに紐づくunreadSchemaのヒストリーデータを削除する
 const userDeleteNoticeController = async (req, res, next) => {
   const token = req.header('x-auth-token');
-  const deleteNoticeService = await deleteNotice(token);
+  const deleteNoticeService = await deleteNotice(token,req.params.id);
   return res.json(deleteNoticeService);
 };
 

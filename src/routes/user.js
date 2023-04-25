@@ -53,9 +53,9 @@ router.put("/reports/:id", userPutReortHistoryController);
 
 //notice
 // user count notice api
-router.get("/notice", userGetNoticeController);
+router.get("/notices", userGetNoticeController);
 // user delete notice api
-router.delete("/notice", userDeleteNoticeController);
+router.delete("/notices/:id", userDeleteNoticeController);
 
 
 router.get("/test",(req, res) => {

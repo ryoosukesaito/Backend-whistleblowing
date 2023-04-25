@@ -63,7 +63,8 @@ const postHistory = async (req, res) => {
         console.error(err);
       });
       // notice 実装
-      const user = await User.findById(history.userId)
+      const report = await Report.findById(history.reportId)
+      const user = await User.findById(report.userId)
       console.log(user.email);
       sendEmail(
         user.email,

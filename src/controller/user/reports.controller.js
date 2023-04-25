@@ -28,7 +28,6 @@ const userPostReportsController = async (req, res, next) => {
 const userGetReportByIdController = async (req, res, next) => {
     // レポート取得
     try {
-        
         const token = req.header('x-auth-token');
         const report = await getReportById(token,req.params.id)
         const histories = await getHistoriesByReportId(token,req.params.id)
