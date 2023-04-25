@@ -7,17 +7,18 @@ const {checkToken} = require('./auth.services')
 
 
 const getNotice = async (token)=>{
+    console.log("notice");
     const targetUser = await checkToken(token)
     const unreads = await Unread.find({userId:targetUser})
 
-    return unreads
+    return data = unreads
 }
 
-const deleteNotice = async (token)=>{
+const deleteNotice = async (token,id)=>{
     const targetUser = await checkToken(token)
-    await Unread.deleteMany({userId:targetUser})
+    await Unread.findByIdAndDelete(id)
     
-    
+    return data={msg:"success"}
 }
 module.exports = {
     getNotice,
