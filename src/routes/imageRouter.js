@@ -27,10 +27,10 @@ module.exports = (upload) => {
         .post(upload.single('file'), (req, res, next) => {
             console.log(req.body);
             // check for existing images
-            Image.findOne({ caption: req.body.caption })
+            const imageFound = Image.findOne({ caption: req.body.caption })
                 .then((image) => {
                     console.log(image);
-                    if (image) {
+                    if (imageFound) {
                         return res.status(200).json({
                             success: false,
                             message: 'Image already exists',
@@ -195,7 +195,7 @@ module.exports = (upload) => {
     */
         imageRouter.route('/file/download/:filename')
         .get((req, res, next) => {
-            gfs.find({ filename: req.params.filename }).toArray((err, files) => {
+            const file = gfs.find({ filename: req.params.filename }).toArray((err, files) => {
                 if (!files[0] || files.length === 0) {
                     return res.status(200).json({
                         success: false,
@@ -203,15 +203,16 @@ module.exports = (upload) => {
                     });
                 }
                else{
-                // gfs.openDownloadStreamByName(req.params.filename).pipe((res));
+
+               
                 gfs.openDownloadStreamByName(req.params.filename).pipe(fs.createWriteStream (path.join(__dirname,".." ,"outputFile",`${req.params.filename}`)));
                 res.status(200).json({
                     success: true,
                     message: `download sucessfully`,
                 });
-               }
-                
-            });
+
+
+            }});
         });
 
     /* 
@@ -226,14 +227,20 @@ module.exports = (upload) => {
                         message: 'No files available',
                     });
                 }
-               else{
-                gfs.openDownloadStreamByName(req.params.filename).pipe((res));
-                // gfs.openDownloadStreamByName(req.params.filename).pipe(fs.createWriteStream (path.join(__dirname,".." ,"outputFile",`${req.params.filename}`)));
-                res.status(200).json({
-                    success: true,
-                    message: `return sucessfully`,
-                });
-               }
+               
+                const write_stream = gfs.openDownloadStreamByName(req.params.filename).pipe(res);
+             
+                write_stream.on("finish",function(){
+                    console.log(`downloaded ${req.params.filename} `)
+                    // return  res.json({
+                    //             success: true,
+                    //             message: `return sucessfully`,
+                    //           })
+                            //   .download(`private/TEMP/${req.params.filename}`)
+                       
+                    })             
+            
+               
                 
             });
         });
