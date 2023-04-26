@@ -43,13 +43,11 @@ const userPatchPasswordController = async (req, res, next) => {
       
       throw error
     }
-    return res.json(changePasswordService)
 }
 
 
 const userPostPasswordEmailController = async (req, res, next) => {
     const re = await requestResetPassword(req.body.email)
-    console.log(re);
 
     return res.json({ message: "Please check your email for verification"})
 }
