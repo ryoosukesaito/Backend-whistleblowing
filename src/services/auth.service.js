@@ -63,7 +63,7 @@ const inviteAdmin=async(email,role)=>{
     await newToken.save()
 
     // 招待メールに添付するURLを指定(front側登録画面のリンク)
-    const link = `${clientUrl}/admins?token=${tokenValue}&email=${email}&role=${role}`
+    const link = `${clientUrl}/api/admin/regist?token=${tokenValue}&email=${email}&role=${role}`
 
         // メール送信
         sendEmail(
@@ -79,12 +79,21 @@ const inviteAdmin=async(email,role)=>{
 // Admin招待メールのリンクにアクセス後のpassword入力とDBへの本登録
 // URLに含まれているtoken,email,と画面上で入力されたname,password
 const signUpAdmin = async(token,email,name,password)=>{
-    
+    console.log("middlewareToken:"+token);
+    console.log("middlewareemail:"+email);
     // AdminTokenスキーマ内のemailと引数で渡されたemailを照合
-    const admintoken = await AdminToken.findOne({email:email})
-    // tokenが一致するかの照合
-    const isValid=await bcrypt.compare(token,admintoken.token)
-    console.log(isValid);
+    try {
+      const admintoken = await AdminToken.findOne({email:email})
+      console.log("admintoken");
+      console.log(admintoken);
+      if(admintoken ===null){
+        // トークンが見つからない
+        throw new Error("Something bad")
+      }
+      
+      // tokenが一致するかの照合
+      const isValid=await bcrypt.compare(token,admintoken.token)
+
 
     if(isValid){
         // tokenが一致した場合、一致したtokenに紐づいたemail,roleを取得
@@ -116,9 +125,13 @@ const signUpAdmin = async(token,email,name,password)=>{
             name: newAdmin.name,
             role: newAdmin.role,
         });
-    }else{
-        // トークンが見つからない
-        throw new Error("something bad")
+      }else{
+          // トークンが一致しない
+          throw new Error("something bad")
+      }
+    } catch (error) {
+      console.log(error);
+      throw error
     }
 }
 
