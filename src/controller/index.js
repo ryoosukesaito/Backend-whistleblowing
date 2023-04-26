@@ -100,10 +100,11 @@ exports.getAllReports = async (req, res) => {
 
 exports.getReportById = async (req, res) => {
   const id = req.params.id;
-  const reportFounddById = await Report.findById(id).populate("userId");
+  const reportFounddById = await Report.findById(id).populate("category_id");
+  console.log(reportFounddById);
   // console.log(reportFounddById);
-  reportFounddById.subject = await CryptoJS.AES.decrypt(reportFounddById.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
-  reportFounddById.description = await CryptoJS.AES.decrypt(reportFounddById.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
+  reportFounddById.subject = CryptoJS.AES.decrypt(reportFounddById.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
+  reportFounddById.description = CryptoJS.AES.decrypt(reportFounddById.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
   // console.log(reportFounddById);
   res.send(reportFounddById);
 };
@@ -196,17 +197,23 @@ exports.createCategory = async (req, res) => {
 };
 
 exports.getAllCategorys = async (req, res) => {
-  const a = await Category.find({});
+  const a = await Category.find({deleteAt:''});
   res.send(a);
 };
 
 exports.deleteCategory = async (req, res) => {
   const id = req.body._id;
-  const CategoryDeleted = await Category.deleteOne({ _id: id });
-
-  if (CategoryDeleted.deletedCount !== 0) {
-    console.log("Category has been deleted");
+  const today=Date.now()
+  console.log(id);
+  console.log(today);
+  try {
+    await Category.findByIdAndUpdate(id,{deleteAt:today});
+    
+  } catch (error) {
+    console.log(error);
   }
+
+    console.log("Category has been deleted");
 
   res.send(CategoryDeleted);
 };
