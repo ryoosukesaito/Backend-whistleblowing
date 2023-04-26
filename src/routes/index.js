@@ -3,7 +3,7 @@ const indexController = require("../controller");
 const {
     // signUpController,
     // signInControllerUser,
-    inviteComtrollerAdmin,
+    inviteControlAdmin,
     resetPasswordRequestController,
     resetPasswordController,
     signInControllerAdmin,
@@ -41,12 +41,6 @@ router.put("/api/admin/reports/:id", indexController.updateReportStateById);
 router.get("/api/admin/notices", indexController.getAdminNoticesController);
 // notice
 router.delete("/api/admin/notices/:id", indexController.deleteAdminNoticesController);
-//admins
-// router.post("/api/admin/create/admin", indexController.createAdmin);
-router.get("/api/admin/all", indexController.getAllAdmins);
-router.get("/api/admin/:id", indexController.getAdminById);
-router.post("/api/admin/update/:id", indexController.updateAdmin);
-router.delete("/api/admin/delete/:id", indexController.deleteAdmin);
 
 //categories
 router.post("/api/admin/create/category", indexController.createCategory);
@@ -68,10 +62,17 @@ router.post("/api/history", postHistory);
 router.post("/api/admin/login", signInControllerAdmin);
 // router.post("/api/user/signup", signUpController);
 
-router.post("/api/admin/invite",inviteComtrollerAdmin)
+//admins
+// router.post("/api/admin/create/admin", indexController.createAdmin);
+router.get("/api/admin/all", indexController.getAllAdmins);
+router.post("/api/admin/update/:id", indexController.updateAdmin);
+router.delete("/api/admin/delete/:id", indexController.deleteAdmin);
+
+router.post("/api/admin/invite",inviteControlAdmin)
 router.post("/api/admin/signup", signUpControllerAdmin);
 router.delete("/api/admin/logout", logoutControllerAdmin);
 router.post("/auth/requestResetPassword", resetPasswordRequestController);
 router.post("/auth/resetPassword", resetPasswordController);
+router.get("/api/admin/:id", indexController.getAdminById);
 
 module.exports = router;
