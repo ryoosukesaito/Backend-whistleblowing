@@ -165,7 +165,7 @@ const signUpAdmin = async(token,email,name,password)=>{
 // }
 
 const signInAdmin = async (email, password) => {
-  let admin = await Admin.findOne({ email });
+  let admin = await Admin.findOne({ email:email,deleteAt:'' });
   console.log(admin);
   if (!admin) throw new Error("Admin does not exists. Please try again");
   //bcrypt.compare() for checking

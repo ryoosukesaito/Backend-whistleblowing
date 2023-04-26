@@ -10,7 +10,8 @@ const CategorySchema = new Schema({
     forReportId: {
         type: Schema.Types.ObjectId,
         ref: 'Report' 
-    }
+    },
+    deleteAt: Date
 })
 
 

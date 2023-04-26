@@ -100,10 +100,11 @@ exports.getAllReports = async (req, res) => {
 
 exports.getReportById = async (req, res) => {
   const id = req.params.id;
-  const reportFounddById = await Report.findById(id).populate("userId");
+  const reportFounddById = await Report.findById(id).populate("category_id");
+  console.log(reportFounddById);
   // console.log(reportFounddById);
-  reportFounddById.subject = await CryptoJS.AES.decrypt(reportFounddById.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
-  reportFounddById.description = await CryptoJS.AES.decrypt(reportFounddById.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
+  reportFounddById.subject = CryptoJS.AES.decrypt(reportFounddById.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
+  reportFounddById.description = CryptoJS.AES.decrypt(reportFounddById.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
   // console.log(reportFounddById);
   res.send(reportFounddById);
 };
@@ -139,8 +140,7 @@ exports.createAdmin = async (req, res) => {
 };
 
 exports.getAllAdmins = async (req, res) => {
-  const a = await Admin.find({});
-  console.log(a);
+  const a = await Admin.find({deleteAt:''});
   res.send(a);
 };
 
@@ -156,7 +156,7 @@ exports.updateAdmin = async (req, res) => {
   const { name, email, password, role } = req.body;
 
   const adminFounddById = await Admin.findById(id);
-  console.log(adminFounddById);
+  // console.log(adminFounddById);
 
   adminFounddById.name = name;
   adminFounddById.email = email;
@@ -170,13 +170,17 @@ exports.updateAdmin = async (req, res) => {
 };
 
 exports.deleteAdmin = async (req, res) => {
-  const id = req.body._id;
-  const adminDeleted = await Admin.deleteOne({ _id: id });
-
-  if (adminDeleted.deletedCount !== 0) {
-    console.log("Category has been deleted");
+  const id = req.params.id;
+  const today= Date.now()
+  console.log(id);
+  console.log(today);
+  try {
+    await Admin.findByIdAndUpdate(id,{ deleteAt: today });
+    
+  } catch (error) {
+    console.error(error)
   }
-
+  console.log("Admin has been deleted");
   res.send(adminDeleted);
 };
 
@@ -196,17 +200,23 @@ exports.createCategory = async (req, res) => {
 };
 
 exports.getAllCategorys = async (req, res) => {
-  const a = await Category.find({});
+  const a = await Category.find({deleteAt:''});
   res.send(a);
 };
 
 exports.deleteCategory = async (req, res) => {
   const id = req.body._id;
-  const CategoryDeleted = await Category.deleteOne({ _id: id });
-
-  if (CategoryDeleted.deletedCount !== 0) {
-    console.log("Category has been deleted");
+  const today=Date.now()
+  console.log(id);
+  console.log(today);
+  try {
+    await Category.findByIdAndUpdate(id,{deleteAt:today});
+    
+  } catch (error) {
+    console.log(error);
   }
+
+    console.log("Category has been deleted");
 
   res.send(CategoryDeleted);
 };
