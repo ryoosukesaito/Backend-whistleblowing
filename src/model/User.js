@@ -23,7 +23,6 @@ const userSchema = new Schema({
     },
     password: {
         type: String,
-        minlength: 10,
         required: true
     },
     createdAt: {

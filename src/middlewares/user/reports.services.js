@@ -32,10 +32,13 @@ const getReports = async (token) => {
 const createReport = async (token, report) => {
   // セッション情報チェック
   const targetUserId = await checkToken(token);
+  console.log(token);
+  console.log(report);
 
   if (targetUserId) {
-    const newReport = await new Report(report);
+    const newReport = new Report(report);
     try {
+      console.log(report)
       newReport.save();
       console.log("saved")
       
@@ -68,7 +71,8 @@ const getReportById = async (token, id) => {
   const targetUserId = await checkToken(token);
 
   if (targetUserId) {
-    const report = await Report.findById(id);
+    const report = await Report.findById(id).populate("adminId").populate("category_id")
+    console.log(report);
     report.subject = CryptoJS.AES.decrypt(report.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
     report.description = CryptoJS.AES.decrypt(report.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
     if (report.userId == targetUserId) {

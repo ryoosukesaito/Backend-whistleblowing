@@ -54,9 +54,19 @@ const postHistory = async (req, res) => {
     //   .catch((err) => {
     //     console.error(err);
     //   });
+    // adminIdに何も入っていなければ、hisotryを投降したadminIDを入れる
+    let agentId = await Report.findById(history.reportId, "adminId").then(
+      (data) => data.adminId
+    );
+    console.log("agentID:" + agentId);
+
+    if (!agentId) {
+      agentId = history.adminId;
+    }
 
     await Report.findByIdAndUpdate(history.reportId, {
       $push: { histories: postNewHistory._id },
+      adminId: agentId,
     })
       .then(() => {
         console.log("Comment updated successfully");

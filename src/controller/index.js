@@ -89,7 +89,7 @@ exports.createReport = async (req, res) => {
 };
 
 exports.getAllReports = async (req, res) => {
-  const a = await Report.find({});
+  const a = await Report.find({}).populate("adminId").populate("category_id");
   a.forEach(report => {
     report.subject = CryptoJS.AES.decrypt(report.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
     report.description = CryptoJS.AES.decrypt(report.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
@@ -100,8 +100,8 @@ exports.getAllReports = async (req, res) => {
 
 exports.getReportById = async (req, res) => {
   const id = req.params.id;
-  const reportFounddById = await Report.findById(id).populate("category_id");
-  console.log(reportFounddById);
+  const reportFounddById = await Report.findById(id).populate("category_id").populate("adminId");
+  // console.log(reportFounddById);
   // console.log(reportFounddById);
   reportFounddById.subject = CryptoJS.AES.decrypt(reportFounddById.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
   reportFounddById.description = CryptoJS.AES.decrypt(reportFounddById.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
@@ -207,8 +207,6 @@ exports.getAllCategorys = async (req, res) => {
 exports.deleteCategory = async (req, res) => {
   const id = req.body._id;
   const today=Date.now()
-  console.log(id);
-  console.log(today);
   try {
     await Category.findByIdAndUpdate(id,{deleteAt:today});
     
