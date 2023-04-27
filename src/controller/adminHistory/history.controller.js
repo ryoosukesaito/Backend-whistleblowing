@@ -34,6 +34,7 @@ const getHistoryByReportId = async (req, res) => {
 //Post a new history to History Schema
 const postHistory = async (req, res) => {
   const history = req.body;
+  
   try {
     const postNewHistory = await History.create({
       reportId: history.reportId,
@@ -52,9 +53,15 @@ const postHistory = async (req, res) => {
     //   .catch((err) => {
     //     console.error(err);
     //   });
+    // adminIdに何も入っていなければ、hisotryを投降したadminIDを入れる
+    let agentId = await Report.findById(history.reportId,"adminId").then(((data)=>data.adminId))
+    console.log("agentID:"+agentId);
+
+    if(!agentId){agentId = history.adminId}
 
     await Report.findByIdAndUpdate(history.reportId, {
       $push: { histories: postNewHistory._id },
+      adminId:agentId
     })
       .then(() => {
         console.log("Comment updated successfully");
@@ -62,6 +69,7 @@ const postHistory = async (req, res) => {
       .catch((err) => {
         console.error(err);
       });
+
       // notice 実装
       const report = await Report.findById(history.reportId)
       const user = await User.findById(report.userId)
