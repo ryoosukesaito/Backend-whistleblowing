@@ -17,7 +17,7 @@ const getReports = async (token) => {
     if (targetUserId) {
       const reports = await Report.find({ userId: targetUserId }).sort({
         createdAt: -1,
-      });
+      }).populate("histories").populate("adminId");
       reports.forEach(report => {
         report.subject = CryptoJS.AES.decrypt(report.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
         report.description = CryptoJS.AES.decrypt(report.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
@@ -52,6 +52,8 @@ const createReport = async (token, report) => {
       reportId: newReport._id,
       adminId: admin._id,
     });
+    console.log("unread:");
+    console.log(unread);
     unread.save();
     sendEmail(
       admin.email,
