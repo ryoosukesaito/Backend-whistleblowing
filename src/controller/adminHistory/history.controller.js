@@ -63,10 +63,11 @@ const postHistory = async (req, res) => {
     if (!agentId) {
       agentId = history.adminId;
     }
-
+    const today = Date.now()
     await Report.findByIdAndUpdate(history.reportId, {
       $push: { histories: postNewHistory._id },
       adminId: agentId,
+      updatedAt:today
     })
       .then(() => {
         console.log("Comment updated successfully");

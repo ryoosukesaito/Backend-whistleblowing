@@ -114,12 +114,12 @@ const putNewHistory = async (token, history, reportId) => {
         name: await getUserNameByReportId(reportId),
         message: history.message,
       });
-      console.log("newHistory");
-      console.log(newHistory);
-      console.log("newHistory");
+      
       await newHistory.save()
+      const today= Date.now()
       await Report.findByIdAndUpdate(reportId, {
         $push: { histories: newHistory._id},
+        updatedAt:today
       }).then((data)=>console.log(data))
       const targetReport = await Report.findById(reportId);
       if (targetReport.adminId) {
