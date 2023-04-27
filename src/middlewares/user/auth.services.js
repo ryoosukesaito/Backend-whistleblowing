@@ -7,6 +7,7 @@ const User = require("../../model/User")
 const Token = require("../../model/Token")
 
 const {jwtSecret, salt, clientUrl} = require("../../config")
+const { log } = require("console")
 
 
 
@@ -58,6 +59,10 @@ const signUp = async (name, email,password) => {
     let user = await User.findOne({ email })
 
     const SIGNUP_ERR_MSG = "Email already exists"
+    console.log(user);
+    console.log(name);
+    console.log(email);
+    console.log(password);
     if(user){ 
         const error =  new Error(SIGNUP_ERR_MSG)
         error.status = 400
@@ -77,7 +82,13 @@ const signUp = async (name, email,password) => {
     // const token = JWT.sign({ id: user._id }, jwtSecret)
 
     // 入力されたuser情報をDBに保存する
-    await user.save()
+    console.log(user);
+    try {
+        await user.save()
+        
+    } catch (error) {
+        console.log(error);
+    }
 
 
     return( data = {
