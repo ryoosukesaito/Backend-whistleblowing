@@ -89,7 +89,7 @@ exports.createReport = async (req, res) => {
 };
 
 exports.getAllReports = async (req, res) => {
-  const a = await Report.find({}).populate("adminId").populate("category_id");
+  const a = await Report.find({}).populate("adminId").populate("category_id").sort({createdAt:-1});
   a.forEach(report => {
     report.subject = CryptoJS.AES.decrypt(report.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
     report.description = CryptoJS.AES.decrypt(report.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
