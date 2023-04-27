@@ -17,9 +17,13 @@ const userGetReportsController = async (req, res, next) => {
 
 //新規レポート作成
 const userPostReportsController = async (req, res, next) => {
+    console.log("きたぞ");
     const {report} = req.body
     const token = req.header('x-auth-token');
     // insert reportのfunction
+    console.log(report)
+    console.log(token)
+
     const createReportService = await createReport(token,report)
     return res.json(createReportService);
 }
