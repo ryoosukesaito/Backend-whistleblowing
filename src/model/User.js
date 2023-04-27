@@ -7,7 +7,7 @@ const {salt} = require("../config")
 const userSchema = new Schema({
     name: {
         type: String,
-        required: true,
+        // required: true,
     },
     NameforReport:{
         type: Schema.Types.ObjectId,
