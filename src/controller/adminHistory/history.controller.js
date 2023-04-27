@@ -2,11 +2,9 @@ const Report = require("../../model/Report");
 const History = require("../../model/History");
 const User = require("../../model/User");
 const Unread = require("../../model/Unread");
-const sendEmail = require("../../utils/email/sendEmail")
-const CryptoJS = require("crypto-js")
-const {
-  cryptoSecret
-} = require("../../config");
+const sendEmail = require("../../utils/email/sendEmail");
+const CryptoJS = require("crypto-js");
+const { cryptoSecret } = require("../../config");
 
 //function for get history by report id
 const getHistoryByReportId = async (req, res) => {
@@ -17,12 +15,15 @@ const getHistoryByReportId = async (req, res) => {
       .populate("histories")
       .then((data) => {
         console.log(data);
-        if(data.histories){
-          data.histories.forEach(history => {
-            history.message = CryptoJS.AES.decrypt(history.message,cryptoSecret).toString(CryptoJS.enc.Utf8)
+        if (data.histories) {
+          data.histories.forEach((history) => {
+            history.message = CryptoJS.AES.decrypt(
+              history.message,
+              cryptoSecret
+            ).toString(CryptoJS.enc.Utf8);
           });
         }
-        res.status(200).send(data)
+        res.status(200).send(data);
       })
       .catch((err) => console.log(err));
   } catch (error) {
@@ -34,7 +35,6 @@ const getHistoryByReportId = async (req, res) => {
 //Post a new history to History Schema
 const postHistory = async (req, res) => {
   const history = req.body;
-  
   try {
     const postNewHistory = await History.create({
       reportId: history.reportId,
@@ -43,6 +43,7 @@ const postHistory = async (req, res) => {
       name: history.name,
       message: history.message,
       replierType: history.replierType,
+      file: history.file,
     });
     // 保存処理が二重になっていた為、暗号化が複数回実行されてしまい複合出来なくなるためコメントアウト
     // const saveNewHistory = await postNewHistory
@@ -54,14 +55,18 @@ const postHistory = async (req, res) => {
     //     console.error(err);
     //   });
     // adminIdに何も入っていなければ、hisotryを投降したadminIDを入れる
-    let agentId = await Report.findById(history.reportId,"adminId").then(((data)=>data.adminId))
-    console.log("agentID:"+agentId);
+    let agentId = await Report.findById(history.reportId, "adminId").then(
+      (data) => data.adminId
+    );
+    console.log("agentID:" + agentId);
 
-    if(!agentId){agentId = history.adminId}
+    if (!agentId) {
+      agentId = history.adminId;
+    }
 
     await Report.findByIdAndUpdate(history.reportId, {
       $push: { histories: postNewHistory._id },
-      adminId:agentId
+      adminId: agentId,
     })
       .then(() => {
         console.log("Comment updated successfully");
@@ -69,23 +74,22 @@ const postHistory = async (req, res) => {
       .catch((err) => {
         console.error(err);
       });
+    // notice 実装
+    const report = await Report.findById(history.reportId);
+    const user = await User.findById(report.userId);
+    console.log(user.email);
+    sendEmail(
+      user.email,
+      "Your report is updated",
+      { name: user.name, reportId: history.reportId },
+      "./template/reportUpdatedByAdmin.handlebars"
+    );
 
-      // notice 実装
-      const report = await Report.findById(history.reportId)
-      const user = await User.findById(report.userId)
-      console.log(user.email);
-      sendEmail(
-        user.email,
-        "Your report is updated",
-        {name:user.name, reportId: history.reportId },
-        "./template/reportUpdatedByAdmin.handlebars"
-      )
-
-      const unread = new Unread({
-        reportId: history.reportId,
-        userId: user._id,
-      });
-      unread.save();
+    const unread = new Unread({
+      reportId: history.reportId,
+      userId: user._id,
+    });
+    unread.save();
     res.status(200).send(postNewHistory);
   } catch (error) {
     let msg;
