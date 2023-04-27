@@ -32,10 +32,10 @@ const getReports = async (token) => {
 const createReport = async (token, report) => {
   // セッション情報チェック
   const targetUserId = await checkToken(token);
-  console.log(token);
   console.log(report);
 
   if (targetUserId) {
+    if(!report.userName) report.userName="Anonymous"
     const newReport = new Report(report);
     try {
       console.log(report)
@@ -114,6 +114,9 @@ const putNewHistory = async (token, history, reportId) => {
         name: await getUserNameByReportId(reportId),
         message: history.message,
       });
+      console.log("newHistory");
+      console.log(newHistory);
+      console.log("newHistory");
       await newHistory.save()
       await Report.findByIdAndUpdate(reportId, {
         $push: { histories: newHistory._id},
