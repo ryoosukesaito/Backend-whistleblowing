@@ -23,7 +23,7 @@ const historySchema = new Schema({
     
     name: {
         type: String,  
-        required: true       
+        // required: true       
     },
     message: {
         type: String,  

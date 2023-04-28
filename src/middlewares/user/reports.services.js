@@ -13,9 +13,12 @@ const getReports = async (token) => {
   const targetUserId = await checkToken(token);
   try {
     if (targetUserId) {
-      const reports = await Report.find({ userId: targetUserId }).sort({
-        createdAt: -1,
-      });
+      const reports = await Report.find({ userId: targetUserId })
+        .sort({
+          createdAt: -1,
+        })
+        .populate("histories")
+        .populate("adminId");
       reports.forEach((report) => {
         report.subject = CryptoJS.AES.decrypt(
           report.subject,
@@ -36,10 +39,10 @@ const getReports = async (token) => {
 const createReport = async (token, report) => {
   // セッション情報チェック
   const targetUserId = await checkToken(token);
-  console.log(token);
   console.log(report);
 
   if (targetUserId) {
+    if (!report.userName) report.userName = "Anonymous";
     const newReport = new Report(report);
     try {
       console.log(report);
@@ -55,6 +58,8 @@ const createReport = async (token, report) => {
         reportId: newReport._id,
         adminId: admin._id,
       });
+      console.log("unread:");
+      console.log(unread);
       unread.save();
       sendEmail(
         admin.email,
@@ -127,9 +132,12 @@ const putNewHistory = async (token, history, reportId) => {
         message: history.message,
         file: history.file,
       });
+
       await newHistory.save();
+      const today = Date.now();
       await Report.findByIdAndUpdate(reportId, {
         $push: { histories: newHistory._id },
+        updatedAt: today,
       }).then((data) => console.log(data));
       const targetReport = await Report.findById(reportId);
       if (targetReport.adminId) {
