@@ -8,8 +8,6 @@ const crypto = require("crypto");
 require("express-async-errors");
 const cors = require("cors");
 
-// require('./services/mongoose.service')
-
 const app = express();
 
 app.set("view engine", "ejs");
