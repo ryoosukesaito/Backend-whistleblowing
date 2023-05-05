@@ -57,7 +57,6 @@ const reportSchema = new Schema({
 });
 
 reportSchema.pre("save", function (next) {
-  // console.log(this);
   const reports = this;
   reports.subject = CryptoJS.AES.encrypt(
     reports.subject,

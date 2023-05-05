@@ -52,7 +52,7 @@ const createReport = async (token, report) => {
       console.log(error);
     }
 
-    const admins = await Admin.find({});
+    const admins = await Admin.find({ deleteAt: { $exists: false } });
     admins.forEach((admin) => {
       const unread = new Unread({
         reportId: newReport._id,

@@ -3,11 +3,9 @@ const Report = require("../model/Report");
 const Admin = require("../model/AdminAccount");
 const Category = require("../model/Category");
 const Unread = require("../model/Unread");
-const JWT = require("jsonwebtoken")
-const CryptoJS = require("crypto-js")
-const {
-  cryptoSecret,jwtSecret,
-} = require("../config");
+const JWT = require("jsonwebtoken");
+const CryptoJS = require("crypto-js");
+const { cryptoSecret, jwtSecret } = require("../config");
 //user
 exports.getAllUsers = async (req, res) => {
   const a = await User.find({});
@@ -31,9 +29,9 @@ exports.createUser = async (req, res) => {
 
 exports.getUserById = async (req, res) => {
   const id = req.params.id;
-  const userFounddById = await User.findById(id);
-  console.log(userFounddById);
-  res.send(userFounddById);
+  const userFoundById = await User.findById(id);
+  console.log(userFoundById);
+  res.send(userFoundById);
 };
 
 // login
@@ -89,10 +87,19 @@ exports.createReport = async (req, res) => {
 };
 
 exports.getAllReports = async (req, res) => {
-  const a = await Report.find({}).populate("adminId").populate("category_id").sort({createdAt:-1});
-  a.forEach(report => {
-    report.subject = CryptoJS.AES.decrypt(report.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
-    report.description = CryptoJS.AES.decrypt(report.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
+  const a = await Report.find({})
+    .populate("adminId")
+    .populate("category_id")
+    .sort({ createdAt: -1 });
+  a.forEach((report) => {
+    report.subject = CryptoJS.AES.decrypt(
+      report.subject,
+      cryptoSecret
+    ).toString(CryptoJS.enc.Utf8);
+    report.description = CryptoJS.AES.decrypt(
+      report.description,
+      cryptoSecret
+    ).toString(CryptoJS.enc.Utf8);
   });
   // console.log(a);
   res.send(a);
@@ -100,29 +107,35 @@ exports.getAllReports = async (req, res) => {
 
 exports.getReportById = async (req, res) => {
   const id = req.params.id;
-  const reportFounddById = await Report.findById(id).populate("category_id").populate("adminId");
-  // console.log(reportFounddById);
-  // console.log(reportFounddById);
-  reportFounddById.subject = CryptoJS.AES.decrypt(reportFounddById.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
-  reportFounddById.description = CryptoJS.AES.decrypt(reportFounddById.description,cryptoSecret).toString(CryptoJS.enc.Utf8)
-  // console.log(reportFounddById);
-  res.send(reportFounddById);
+  const reportFoundById = await Report.findById(id)
+    .populate("category_id")
+    .populate("adminId");
+
+  reportFoundById.subject = CryptoJS.AES.decrypt(
+    reportFoundById.subject,
+    cryptoSecret
+  ).toString(CryptoJS.enc.Utf8);
+  reportFoundById.description = CryptoJS.AES.decrypt(
+    reportFoundById.description,
+    cryptoSecret
+  ).toString(CryptoJS.enc.Utf8);
+  res.send(reportFoundById);
 };
 
-exports.updateReportStateById =async(req,res)=>{
+exports.updateReportStateById = async (req, res) => {
   const id = req.params.id;
-  const {status}=req.body
+  const { status } = req.body;
   console.log(status);
   try {
-    await Report.findByIdAndUpdate(id,{
-      status:status
-    })
-    res.send({msg:"success"}) 
+    await Report.findByIdAndUpdate(id, {
+      status: status,
+    });
+    res.send({ msg: "success" });
   } catch (error) {
     console.log(error);
-    throw error
+    throw error;
   }
-}
+};
 
 //admin
 
@@ -140,45 +153,41 @@ exports.createAdmin = async (req, res) => {
 };
 
 exports.getAllAdmins = async (req, res) => {
-  const a = await Admin.find({deleteAt:''});
+  const a = await Admin.find({ deleteAt: "" });
   res.send(a);
 };
 
 exports.getAdminById = async (req, res) => {
   const id = req.params.id;
-  const adminFounddById = await Admin.findById(id);
-  console.log(adminFounddById);
-  res.send(adminFounddById);
+  const adminFoundById = await Admin.findById(id);
+  console.log(adminFoundById);
+  res.send(adminFoundById);
 };
 
 exports.updateAdmin = async (req, res) => {
   const id = req.body._id;
-  const { name, email, password, role } = req.body;
+  const { name, email } = req.body;
 
-  const adminFounddById = await Admin.findById(id);
-  // console.log(adminFounddById);
+  const adminFoundById = await Admin.findById(id);
 
-  adminFounddById.name = name;
-  adminFounddById.email = email;
-  adminFounddById.password = password;
-  adminFounddById.role = role;
+  adminFoundById.name = name;
+  adminFoundById.email = email;
 
-  await adminFounddById.save();
-  console.log(adminFounddById);
+  await adminFoundById.save();
+  console.log(adminFoundById);
 
-  res.send(adminFounddById);
+  res.status(201).send(adminFoundById);
 };
 
 exports.deleteAdmin = async (req, res) => {
   const id = req.params.id;
-  const today= Date.now()
+  const today = Date.now();
   console.log(id);
   console.log(today);
   try {
-    await Admin.findByIdAndUpdate(id,{ deleteAt: today });
-    
+    await Admin.findByIdAndUpdate(id, { deleteAt: today });
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
   console.log("Admin has been deleted");
   res.send(adminDeleted);
@@ -199,63 +208,63 @@ exports.createCategory = async (req, res) => {
   }
 };
 
-exports.getAllCategorys = async (req, res) => {
-  const a = await Category.find({deleteAt:''});
+exports.getAllCategories = async (req, res) => {
+  const a = await Category.find({ deleteAt: "" });
   res.send(a);
 };
 
 exports.deleteCategory = async (req, res) => {
   const id = req.body._id;
-  const today=Date.now()
+  const today = Date.now();
   try {
-    await Category.findByIdAndUpdate(id,{deleteAt:today});
-    
+    await Category.findByIdAndUpdate(id, { deleteAt: today });
   } catch (error) {
     console.log(error);
   }
 
-    console.log("Category has been deleted");
+  console.log("Category has been deleted");
 
   res.send(CategoryDeleted);
 };
-exports.getAdminNoticesController= async(req,res)=>{
-  const token = req.header('x-auth-token');
+exports.getAdminNoticesController = async (req, res) => {
+  const token = req.header("x-auth-token");
   console.log(token);
-  if(token){
+  if (token) {
     const admin = await JWT.verify(token, jwtSecret);
-    const notices = await Unread.find({adminId:admin.id})
-    const resData = []
-    if(notices){
-      for(const notice of notices){
-        const subject = await getSubjectByReportId(notice.reportId)
-        resData.push({id:notice.id,reportId:notice.reportId,subject:subject})
+    const notices = await Unread.find({ adminId: admin.id });
+    const resData = [];
+    if (notices) {
+      for (const notice of notices) {
+        const subject = await getSubjectByReportId(notice.reportId);
+        resData.push({
+          id: notice.id,
+          reportId: notice.reportId,
+          subject: subject,
+        });
       }
     }
-    return res.send(data=resData)
-
-  }else{
-    throw new Error("something bad")
+    return res.send((data = resData));
+  } else {
+    throw new Error("something bad");
   }
-}
-exports.deleteAdminNoticesController=async (req,res)=>{
+};
+exports.deleteAdminNoticesController = async (req, res) => {
   try {
-    await Unread.findByIdAndDelete(req.params.id)
+    await Unread.findByIdAndDelete(req.params.id);
     console.log("delete");
-    res.send( data={msg:"success"})
+    res.send((data = { msg: "success" }));
   } catch (error) {
-    throw error
+    throw error;
   }
-}
-const getSubjectByReportId= async (reportId)=>{
-  const report = await Report.findById(reportId)
-  if(report){
-    const subject = CryptoJS.AES.decrypt(report.subject,cryptoSecret).toString(CryptoJS.enc.Utf8)
-    return subject
-  }else{
-    return "Not Found Report"
+};
+const getSubjectByReportId = async (reportId) => {
+  const report = await Report.findById(reportId);
+  if (report) {
+    const subject = CryptoJS.AES.decrypt(report.subject, cryptoSecret).toString(
+      CryptoJS.enc.Utf8
+    );
+    return subject;
+  } else {
+    return "Not Found Report";
   }
-}
-
-// module.exports={
-//   getAdminNoticesController
-// }
+};

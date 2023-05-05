@@ -1,15 +1,13 @@
 const router = require("express").Router();
 const indexController = require("../controller");
 const {
-    // signUpController,
-    // signInControllerUser,
-    inviteControlAdmin,
-    resetPasswordRequestController,
-    resetPasswordController,
-    signInControllerAdmin,
-    signUpControllerAdmin,
-    logoutControllerAdmin,
-  } = require("../controller/auth.controller");
+  inviteControlAdmin,
+  resetPasswordRequestController,
+  resetPasswordController,
+  signInControllerAdmin,
+  signUpControllerAdmin,
+  logoutControllerAdmin,
+} = require("../controller/auth.controller");
 
 // const {
 //   getAdminNoticesController
@@ -40,11 +38,14 @@ router.put("/api/admin/reports/:id", indexController.updateReportStateById);
 // notice
 router.get("/api/admin/notices", indexController.getAdminNoticesController);
 // notice
-router.delete("/api/admin/notices/:id", indexController.deleteAdminNoticesController);
+router.delete(
+  "/api/admin/notices/:id",
+  indexController.deleteAdminNoticesController
+);
 
 //categories
 router.post("/api/admin/create/category", indexController.createCategory);
-router.get("/api/admin/category/all", indexController.getAllCategorys);
+router.get("/api/admin/category/all", indexController.getAllCategories);
 router.delete("/api/admin/category/delete/:id", indexController.deleteCategory);
 
 //History
@@ -60,15 +61,14 @@ router.post("/api/history", postHistory);
 //because we will post new token on it
 // router.post("/api/user/login", signInControllerUser);
 router.post("/api/admin/login", signInControllerAdmin);
-// router.post("/api/user/signup", signUpController);
 
 //admins
-// router.post("/api/admin/create/admin", indexController.createAdmin);
+
 router.get("/api/admin/all", indexController.getAllAdmins);
 router.post("/api/admin/update/:id", indexController.updateAdmin);
 router.delete("/api/admin/delete/:id", indexController.deleteAdmin);
 
-router.post("/api/admin/invite",inviteControlAdmin)
+router.post("/api/admin/invite", inviteControlAdmin);
 router.post("/api/admin/signup", signUpControllerAdmin);
 router.delete("/api/admin/logout", logoutControllerAdmin);
 router.post("/auth/requestResetPassword", resetPasswordRequestController);
