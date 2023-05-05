@@ -12,7 +12,7 @@ npm run dev
 
 ## backend API documentation
 
-https://docs.google.com/spreadsheets/d/1VKras1BjnyMhqFx3t7bIxtpX9c_y50C9fZqlR6UQn3I/edit?usp=sharing
+<!-- https://docs.google.com/spreadsheets/d/1VKras1BjnyMhqFx3t7bIxtpX9c_y50C9fZqlR6UQn3I/edit?usp=sharing -->
 
 ### admin side APIs
 
