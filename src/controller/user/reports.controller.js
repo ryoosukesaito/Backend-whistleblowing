@@ -1,65 +1,62 @@
 const {
-    getReports,
-    createReport,
-    getReportById,
-    getHistoriesByReportId,
-    putNewHistory
-  } = require("../../middlewares/user/reports.services");
-
+  getReports,
+  createReport,
+  getReportById,
+  getHistoriesByReportId,
+  putNewHistory,
+} = require("../../middlewares/user/reports.services");
 
 //ログインユーザーに紐づくレポートデータを返す
 const userGetReportsController = async (req, res, next) => {
-    const token = req.header('x-auth-token');
-    const getReportService = await getReports(token);
-    return res.json(getReportService);
-  };
-
+  const token = req.header("x-auth-token");
+  const getReportService = await getReports(token);
+  return res.json(getReportService);
+};
 
 //新規レポート作成
 const userPostReportsController = async (req, res, next) => {
-    console.log("きたぞ");
-    const {report} = req.body
-    const token = req.header('x-auth-token');
-    // insert reportのfunction
-    console.log(report)
-    console.log(token)
+  console.log("きたぞ");
+  const { report } = req.body;
+  const token = req.header("x-auth-token");
+  // insert reportのfunction
+  console.log(report);
+  console.log(token);
 
-    const createReportService = await createReport(token,report)
-    return res.json(createReportService);
-}
+  const createReportService = await createReport(token, report);
+  return res.json(createReportService);
+};
 
 //レポート詳細取得
 const userGetReportByIdController = async (req, res, next) => {
-    // レポート取得
-    try {
-        const token = req.header('x-auth-token');
-        const report = await getReportById(token,req.params.id)
-        const histories = await getHistoriesByReportId(token,req.params.id)
-        return res.json(
-            {
-                report:report,
-                histories:histories
-            }
-            )
-        } catch (error) {
-            throw error
-        }
-    
-}
+  // レポート取得
+  try {
+    const token = req.header("x-auth-token");
+    const report = await getReportById(token, req.params.id);
+    const histories = await getHistoriesByReportId(token, req.params.id);
+    return res.json({
+      report: report,
+      histories: histories,
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 
 //レポートへ新しいhistoryを投稿
-const userPutReortHistoryController = async (req, res, next) => {
-    const history = req.body 
-    const token = req.header('x-auth-token');  
-    const putNewHistoryService = await putNewHistory(token,history,req.params.id)
-    return res.json(putNewHistoryService);
-
-} 
-
+const userPutReportHistoryController = async (req, res, next) => {
+  const history = req.body;
+  const token = req.header("x-auth-token");
+  const putNewHistoryService = await putNewHistory(
+    token,
+    history,
+    req.params.id
+  );
+  return res.json(putNewHistoryService);
+};
 
 module.exports = {
-    userGetReportsController,
-    userPostReportsController,
-    userGetReportByIdController,
-    userPutReortHistoryController,
-  };
+  userGetReportsController,
+  userPostReportsController,
+  userGetReportByIdController,
+  userPutReportHistoryController,
+};

@@ -214,7 +214,6 @@ module.exports = (upload) => {
           message: "No files available",
         });
       } else {
-        // gfs.openDownloadStreamByName(req.params.filename).pipe((res));
         gfs
           .openDownloadStreamByName(req.params.filename)
           .pipe(
@@ -248,11 +247,6 @@ module.exports = (upload) => {
 
       write_stream.on("finish", function () {
         console.log(`downloaded ${req.params.filename} `);
-        // return  res.json({
-        //             success: true,
-        //             message: `return sucessfully`,
-        //           })
-        //   .download(`private/TEMP/${req.params.filename}`)
       });
     });
   });

@@ -6,7 +6,7 @@ const path = require("path");
 const res = require("express/lib/response");
 
 const {
-  email: { host, username, port, password, from }
+  email: { host, username, port, password, from },
 } = require("../../config");
 
 const sendEmail = async (email, subject, payload, template) => {
@@ -15,29 +15,29 @@ const sendEmail = async (email, subject, payload, template) => {
     port: port,
     auth: {
       user: username,
-      pass: password
-    }
+      pass: password,
+    },
   });
 
-  const source = fs.readFileSync(path.join(__dirname, template), "utf8")
-  const compiledTemplate = handlebars.compile(source)
+  const source = fs.readFileSync(path.join(__dirname, template), "utf8");
+  const compiledTemplate = handlebars.compile(source);
 
   // send mail with defined transport object
   const options = () => ({
     from: from,
     to: email,
     subject: subject,
-    html: compiledTemplate(payload) //res.render("", payload)
+    html: compiledTemplate(payload),
     //pass the payload from auth.service to the source template
   });
 
   transporter.sendMail(options(), (error, info) => {
-    if(error) return error
-    else{
-        console.log(info)
-        return res.status(200).json({ success: true })
+    if (error) return error;
+    else {
+      console.log(info);
+      return res.status(200).json({ success: true });
     }
-  })
+  });
 };
 
 module.exports = sendEmail;

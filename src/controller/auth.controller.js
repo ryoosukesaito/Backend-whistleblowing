@@ -9,39 +9,35 @@ const {
   logoutAdmin,
 } = require("../services/auth.service");
 
-  
-  const signUpController = async (req, res, next) => {
-    const signUpService = await signUp(req.body);
-    return res.json(signUpService);
-  };
+const signUpController = async (req, res, next) => {
+  const signUpService = await signUp(req.body);
+  return res.json(signUpService);
+};
 
-  const inviteControlAdmin = async(req,res,next)=>{
-    const {email,role} = req.body
-    console.log("controller");
-    console.log(email);
-    console.log(role);
-    console.log(req.body);
-    const inviteService = await inviteAdmin(email,role)
-    return res.json(inviteService)
-  }
+const inviteControlAdmin = async (req, res, next) => {
+  const { email, role } = req.body;
+  console.log("controller");
+  console.log(email);
+  console.log(role);
+  console.log(req.body);
+  const inviteService = await inviteAdmin(email, role);
+  return res.json(inviteService);
+};
 
-  const signUpControllerAdmin = async (req, res, next) => {
-    // const signUpService = await signUpAdmin(req.body);
-    console.log("start");
-    console.log(req.body);
-    const {token,email,name,password} = req.body
+const signUpControllerAdmin = async (req, res, next) => {
+  const { token, email, name, password } = req.body;
 
-    const signUpService = await signUpAdmin(token,email,name,password)
-    console.log("signUpControllerAdmin");
-    console.log(signUpService);
-    return res.json(signUpService);
-  };
-  
-  const signInControllerUser = async (req, res, next) => {
-      const { email, password } = req.body
-      const signInService = await signInUser(email, password)
-      return res.json(signInService)
-  }
+  const signUpService = await signUpAdmin(token, email, name, password);
+  console.log("signUpControllerAdmin");
+  console.log(signUpService);
+  return res.json(signUpService);
+};
+
+const signInControllerUser = async (req, res, next) => {
+  const { email, password } = req.body;
+  const signInService = await signInUser(email, password);
+  return res.json(signInService);
+};
 
 const signInControllerAdmin = async (req, res, next) => {
   const { email, password } = req.body;
