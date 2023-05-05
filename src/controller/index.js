@@ -101,7 +101,6 @@ exports.getAllReports = async (req, res) => {
       cryptoSecret
     ).toString(CryptoJS.enc.Utf8);
   });
-  // console.log(a);
   res.send(a);
 };
 
