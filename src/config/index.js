@@ -3,10 +3,10 @@ const dotenv = require("dotenv");
 // Set the NODE_ENV to 'development' by default
 process.env.NODE_ENV = process.env.NODE_ENV || "development";
 
-const envFound = dotenv.config();
-if (envFound.error) {
-  throw new Error("⚠️  Couldn't find .env file  ⚠️");
-}
+// const envFound = dotenv.config();
+// if (envFound.error) {
+//   throw new Error("⚠️  Couldn't find .env file  ⚠️");
+// }
 
 module.exports = {
   port: process.env.PORT,
@@ -26,5 +26,5 @@ module.exports = {
     from: process.env.EMAIL_FROM,
   },
   rootDir: process.cwd(),
-  cryptoSecret: process.env.CRYPTO_SECRET
+  cryptoSecret: process.env.CRYPTO_SECRET,
 };
